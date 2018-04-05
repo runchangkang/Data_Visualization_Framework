@@ -18,4 +18,5 @@ public class CSVReaderTest {
         List<Integer> list = new ArrayList<>();
         reader.inputData("test.csv", 0,0,0, list);
     }
+
 }
