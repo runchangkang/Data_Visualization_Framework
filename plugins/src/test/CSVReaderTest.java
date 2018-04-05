@@ -10,13 +10,14 @@ public class CSVReaderTest {
 
     @Before
     public void setup() throws IOException {
-        CSVReader reader = new CSVReader();
+        reader = new CSVReader();
     }
 
     @Test
     public void testInputData() throws IOException {
         List<Integer> list = new ArrayList<>();
-        reader.inputData("test.csv", 0,0,0, list);
+//        FileReader z = new FileReader("resources/test.csv");
+        reader.inputData("resources/test.csv", 0,0,0, list);
     }
 
 }
