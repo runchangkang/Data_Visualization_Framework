@@ -26,7 +26,7 @@ public class CSVReader implements DataPlugin {
         try {
             reader = new CsvMapReader(file, CsvPreference.STANDARD_PREFERENCE);
             final String[] header = reader.getHeader(true);
-            final CellProcessor[] processors = null;
+            final CellProcessor[] processors = new CellProcessor[header.length];
             Map<String, Object> values = new HashMap<>();
             while ((values = reader.read(header, processors)) != null) {
                 System.out.println(String.format("lineNo=%s, rowNo=%s, customerMap=%s", reader.getLineNumber(),
