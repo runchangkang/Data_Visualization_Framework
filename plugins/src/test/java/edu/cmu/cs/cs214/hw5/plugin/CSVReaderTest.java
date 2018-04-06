@@ -1,3 +1,5 @@
+package edu.cmu.cs.cs214.hw5.plugin;
+
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,3 +1,5 @@
+package edu.cmu.cs.cs214.hw5.core;
+
 /**
  * The DataPoint representation.
  * Has x, y, time, and attribute value.

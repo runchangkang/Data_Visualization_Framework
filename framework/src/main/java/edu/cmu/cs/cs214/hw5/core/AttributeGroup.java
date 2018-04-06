@@ -1,9 +1,10 @@
+package edu.cmu.cs.cs214.hw5.core;
 
 import java.util.ArrayList;
 
 /**
  * AttributeGroup class that holds all datapoints with the
- * given specific attrbitue type.
+ * given specific attribute type.
  */
 public class AttributeGroup {
     private String type;
