@@ -18,7 +18,6 @@ public class CSVReaderTest {
     @Test
     public void testInputData() throws IOException {
         List<Integer> list = new ArrayList<>();
-//        FileReader z = new FileReader("resources/test.csv");
         reader.inputData("resources/test.csv", 0,0,0, list);
     }
 

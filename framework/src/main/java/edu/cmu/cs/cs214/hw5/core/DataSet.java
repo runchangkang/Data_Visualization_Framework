@@ -12,7 +12,7 @@ public abstract class DataSet {
 
     protected Map<String,AttributeGroup> attributeGroups;
 
-    DataSet(Map<String,AttributeGroup> setMap){
+    public DataSet(Map<String,AttributeGroup> setMap){
         this.attributeGroups = new HashMap<>(setMap);
     }
 

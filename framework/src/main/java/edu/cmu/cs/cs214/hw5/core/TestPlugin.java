@@ -1,5 +1,7 @@
 package edu.cmu.cs.cs214.hw5.core;
 
+import java.util.List;
+
 public class TestPlugin implements DataPlugin{
     @Override
     public String getName() {
@@ -13,6 +15,11 @@ public class TestPlugin implements DataPlugin{
 
     @Override
     public ClientPoint getNext() {
+        return null;
+    }
+
+    @Override
+    public List<String> getPopupParameters() {
         return null;
     }
 }

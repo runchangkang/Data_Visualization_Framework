@@ -8,6 +8,7 @@ import org.supercsv.prefs.CsvPreference;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +30,16 @@ public class CSVReader implements DataPlugin {
         return new ClientPoint(0,0,0,new HashMap<>());
     }
 
+    @Override
+    public List<String> getPopupParameters(){
+        return new ArrayList<>();
+    }
     /**
      * Uses the DataSet's makePoint method
      * to add points.
      *
-     * @param path
-     * @param xcol
+     * @param path file path
+     * @param xcol 
      * @param ycol
      * @param tcol
      * @param attrCols
