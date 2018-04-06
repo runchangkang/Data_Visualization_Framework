@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Dummy plugin implementation to test Loader
+ */
 public class TestPlugin implements DataPlugin{
     @Override
     public String getName() {

@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import edu.cmu.cs.cs214.hw5.core.PluginLoader;
 
+/**
+ * Dummy GUI implementation to test layout and loading
+ */
 public class ControlPanel extends JPanel{
 
     JFrame frame;
@@ -37,11 +40,15 @@ public class ControlPanel extends JPanel{
         JPanel panel = new JPanel(new GridLayout(0,1));
         panel.add(new JButton("Data Plugins"));
 
-        for (String plugin : PluginLoader.listPlugins()){
+        for (String plugin : PluginLoader.listDataPlugins()){
             panel.add(new JButton(plugin));
         }
 
         panel.add(new JButton("Visual Plugins"));
+
+        for (String plugin : PluginLoader.listVisualPlugins()){
+            panel.add(new JButton(plugin));
+        }
 
         panel.setPreferredSize(new Dimension(200,600));
         return panel;

@@ -12,6 +12,9 @@ public abstract class DataSet {
 
     protected Map<String,AttributeGroup> attributeGroups;
 
+    /**
+     * @param setMap new DataSet with initial values
+     */
     public DataSet(Map<String,AttributeGroup> setMap){
         this.attributeGroups = new HashMap<>(setMap);
     }

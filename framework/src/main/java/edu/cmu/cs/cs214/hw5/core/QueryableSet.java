@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Library class that implements custom data structures to enhance querying for data that is "nearby"
+ * other Geo-Tagged data in the set.
+ */
 public class QueryableSet {
 
     private DataSet dataSet;
@@ -26,10 +30,17 @@ public class QueryableSet {
         return dataSet.getAttributeGroup(attribute).getDataPoints().get(0).getAttr();
     }
 
+    /**
+     * @return all attributes that the set currently contains
+     */
     public Set<String> getAttributes(){
         return dataSet.getAttributes();
     }
 
+    /**
+     * @param attribute to query for
+     * @return all DataPoints that contain a specific attribute
+     */
     public List<DataPoint> getAttributeGroup(String attribute){
         return new ArrayList<>(dataSet.getAttributeGroup(attribute).getDataPoints());
     }

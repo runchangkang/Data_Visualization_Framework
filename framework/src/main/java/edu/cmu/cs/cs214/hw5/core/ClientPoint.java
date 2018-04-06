@@ -5,6 +5,8 @@ import java.util.Map;
 
 /**
  * Library Point class set up for the Data Plugin interface to call - accessible to client.
+ * This is primarily provided for convenience and encapsulation, so that the client is separated
+ * from the internals of the DataSet class.
  */
 public class ClientPoint {
 
@@ -55,6 +57,10 @@ public class ClientPoint {
         return new HashMap<>(attributes);
     }
 
+
+    /**
+     * @return convenient string output
+     */
     @Override
     public String toString() {
         String start =  "< x: " + x + " y: " + y + " t: " + t;
