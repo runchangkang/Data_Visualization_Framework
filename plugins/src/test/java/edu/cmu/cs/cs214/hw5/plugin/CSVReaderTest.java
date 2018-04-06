@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CSVReaderTest {
@@ -16,10 +17,8 @@ public class CSVReaderTest {
     }
 
     @Test
-    public void testInputData() throws IOException {
-        List<Integer> list = new ArrayList<>();
-//        FileReader z = new FileReader("resources/test.csv");
-        reader.inputData("resources/test.csv", 0,0,0, list);
+    public void testInputData() throws Exception {
+        reader.inputData("resources/test.csv","X","Y","Time", Arrays.asList("Wind","Light"));
     }
 
 }
