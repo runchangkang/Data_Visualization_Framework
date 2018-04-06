@@ -1,6 +1,8 @@
 package edu.cmu.cs.cs214.hw5.core;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class TestPlugin implements DataPlugin{
     @Override
@@ -8,18 +10,14 @@ public class TestPlugin implements DataPlugin{
         return "Hello from TestPlugin!";
     }
 
-    @Override
-    public boolean hasNext() {
-        return false;
-    }
 
     @Override
-    public ClientPoint getNext() {
+    public List<String> getPopupParameters() {
         return null;
     }
 
     @Override
-    public List<String> getPopupParameters() {
+    public Collection<ClientPoint> getCollection(Map<String,String> argumentMap) throws Exception{
         return null;
     }
 }

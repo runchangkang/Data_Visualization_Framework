@@ -1,10 +1,12 @@
 package edu.cmu.cs.cs214.hw5.core;
 
-import java.awt.*;
+import javax.swing.*;
 
 public interface VisualPlugin {
 
+    String getName();
+
     ParameterList addInterfaceParameters();
 
-    void drawSet(Graphics2D g2d, QueryableSet qSet, int x, int y);
+    JPanel drawSet(QueryableSet qSet, int x, int y);
 }
