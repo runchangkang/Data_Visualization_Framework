@@ -24,4 +24,31 @@ public class DataPoint {
         this.attr = attr;
     }
 
+    /**
+     * @return x
+     */
+    public double getX() {
+        return x;
+    }
+
+    /**
+     * @return y
+     */
+    public double getY() {
+        return y;
+    }
+
+    /**
+     * @return t
+     */
+    public double getT() {
+        return t;
+    }
+
+    /**
+     * @return attribute value
+     */
+    public double getAttr() {
+        return attr;
+    }
 }

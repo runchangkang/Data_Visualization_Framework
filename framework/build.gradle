@@ -2,3 +2,14 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'application'
 
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    compile name: 'MathParser.org-mXparser-jdk18-4.1.1'
+    testCompile 'junit:junit:4.12'
+}
