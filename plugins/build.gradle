@@ -9,8 +9,12 @@ repositories {
     mavenCentral()
 }
 
-
 dependencies {
     compile name: 'super-csv-2.4.0'
+    compile project(':framework')
     testCompile 'junit:junit:4.12'
+}
+
+run {
+    main = 'edu.cmu.cs.cs214.hw5.core.Main'
 }
