@@ -1,5 +1,7 @@
 package edu.cmu.cs.cs214.hw5.gui;
 
+import edu.cmu.cs.cs214.hw5.core.DataGraph;
+
 import javax.swing.SwingUtilities;
 
 /**
@@ -19,7 +21,7 @@ public class FrameworkGUI {
      */
     private void createAndShowSetupScreen() {
         ControlPanel graph = new ControlPanel();
-        graph.launch();
+        graph.launch(new DataGraph());
     }
 
 }
