@@ -1,16 +1,17 @@
 package edu.cmu.cs.cs214.hw5.gui;
 
 import javax.swing.*;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import edu.cmu.cs.cs214.hw5.core.DataGraph;
-import edu.cmu.cs.cs214.hw5.core.DataPlugin;
-import edu.cmu.cs.cs214.hw5.core.PluginLoader;
+import edu.cmu.cs.cs214.hw5.core.*;
 
 import java.awt.*;
+import java.util.Map;
 
 
 /**
@@ -125,7 +126,7 @@ public class ControlPanel extends JPanel{
 
     private void dataSetDialog(){
         final JDialog dialog = new JDialog(frame,
-                "Select a DataSet",
+                "Select a DataSet Plugin",
                 true);
 
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
@@ -190,6 +191,62 @@ public class ControlPanel extends JPanel{
     private void dataPluginDialog(){
         DataPlugin dp = PluginLoader.getDataPlugin(this.selectedDataPlugin);
         List<String> options = dp.getPopupParameters();
+
+        final JDialog dialog = new JDialog(frame,
+                "Select a DataSet Plugin",
+                true);
+
+        JPanel optionPanel = new JPanel(new GridLayout(0,1));
+
+        Map<String,String> argMap = new HashMap<>();
+
+        for (String parameter : options){
+            JPanel paramPanel = new JPanel();
+            JLabel paramLabel = new JLabel(parameter);
+            JTextField paramValue = new JTextField(30);
+            paramValue.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusGained(java.awt.event.FocusEvent evt) { }
+                public void focusLost(java.awt.event.FocusEvent evt) {
+                    argMap.put(parameter,paramValue.getText());
+                }
+            });
+            paramPanel.add(paramLabel);
+            paramPanel.add(paramValue);
+            optionPanel.add(paramPanel);
+        }
+
+
+        JButton closeButton = new JButton("CREATE");
+        closeButton.addActionListener(e -> {
+            if(verifyMap(argMap,options)){
+                try {
+                    Collection<ClientPoint> dSet = dp.getCollection(argMap);
+                    graph.addDataSet(dSet);
+                    dialog.setVisible(false);
+                }
+                catch (Exception Exception){
+                    System.out.println("Wasn't able to parse data.");
+                }
+            }
+        });
+        optionPanel.add(closeButton);
+
+        dialog.setContentPane(optionPanel);
+        dialog.pack();
+        dialog.setVisible(true);
+        dialog.setLocationRelativeTo(frame);
+    }
+
+    private boolean verifyMap(Map<String,String> argMap, List<String> options){
+        for (String option : options){
+            if(!argMap.containsKey(option)){
+                return false;
+            }
+            if ("".equals(argMap.get(option))){
+                return false;
+            }
+        }
+        return true;
     }
 
 }

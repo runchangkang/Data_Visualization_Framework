@@ -1,5 +1,6 @@
 package edu.cmu.cs.cs214.hw5.core;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -14,5 +15,10 @@ public class DataGraph {
      */
     public void addRelation(Relation relation){
         relations.add(relation);
+    }
+
+
+    public void addDataSet(Collection<ClientPoint> initialSet){
+        //make a new dataset here
     }
 }
