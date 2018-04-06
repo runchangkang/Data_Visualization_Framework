@@ -1,18 +1,21 @@
 package edu.cmu.cs.cs214.hw5.core.processors;
 
-import java.util.function.DoubleFunction;
+import org.mariuszgromada.math.mxparser.Expression;
 
 /**
  * Implements double -> double transformations
  */
 public class TransformExpression {
 
-    private DoubleFunction<Double> transformFunc;
+    private Expression transformFunc;
 
     /**
      * @param transformFunc function to perform transform with
      */
-    TransformExpression(DoubleFunction<Double> transformFunc){
+    TransformExpression(Expression transformFunc){
+        if (transformFunc.getArgumentsNumber() > 1){
+            throw new IllegalArgumentException("Multivariable functions not yet supported.");
+        }
         this.transformFunc = transformFunc;
     }
 
@@ -21,6 +24,7 @@ public class TransformExpression {
      * @return transformation applied to argument
      */
     public double apply(double x){
-        return transformFunc.apply(x);
+        transformFunc.getArgument(0).setArgumentValue(x);
+        return transformFunc.calculate();
     }
 }
