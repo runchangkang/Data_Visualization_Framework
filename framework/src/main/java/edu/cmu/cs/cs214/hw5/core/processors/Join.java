@@ -25,11 +25,14 @@ public class Join implements Processor {
     @Override
     public DataSet apply(List<DataSet> sources) {
         List<DataPoint> newList = new ArrayList<>();
+        StringBuilder names = new StringBuilder();
 
         for (DataSet set : sources){
             newList.addAll(set.getDataPoints());
+            names.append(set.getName());
+            names.append(" ");
         }
 
-        return new GeoDataSet(newList,sources.get(0).getName() + "1");
+        return new GeoDataSet(newList,names.toString());
     }
 }

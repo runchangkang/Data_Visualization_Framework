@@ -5,6 +5,7 @@ import java.util.*;
 
 import edu.cmu.cs.cs214.hw5.core.*;
 import edu.cmu.cs.cs214.hw5.core.processors.Filter;
+import edu.cmu.cs.cs214.hw5.core.processors.Join;
 import edu.cmu.cs.cs214.hw5.core.processors.Transform;
 
 import java.awt.*;
@@ -53,17 +54,16 @@ public class ControlPanel extends JPanel{
         JPanel gPanel = new JPanel(new GridLayout(0, 1));
 
         int pHeight = Math.min(50,height / ((graph.getRelations().size() * 2 )+ 1));
-        System.out.println(pHeight);
 
-        for (Relation rel : graph.getRelations()) {
+        for (DataSet set : graph.getDataSets()) {
             JPanel relPanel = new JPanel(new GridLayout(0, 1));
-            JLabel name = new JLabel(rel.getSources().get(0).getName());
+            JLabel name = new JLabel(set.getName());
             name.setHorizontalAlignment(JLabel.CENTER);
             name.setHorizontalTextPosition(JLabel.CENTER);
 
             JButton button = new JButton("applyFilter");
             button.setSize(new Dimension(width,pHeight/4));
-            button.addActionListener( e -> transDialog(rel.getResult()));
+            button.addActionListener( e -> transDialog(set));
 
 
             relPanel.add(name);
@@ -144,11 +144,14 @@ public class ControlPanel extends JPanel{
 
         JButton closeButton = new JButton("APPLY");
 
+        //todo: move the graph application logic entirely into datagraph class
         closeButton.addActionListener(e -> {
             try {
                 Filter f = new Filter(argMap);
                 List<DataSet> dsList = new ArrayList<>(Collections.singletonList(dataSet));
-                graph.addRelation(new Relation(dsList,f));
+                DataSet filtered = f.apply(dsList);
+                graph.addDataSet(filtered);
+                graph.addRelation(new Relation(dataSet,f,filtered));
                 dialog.setVisible(false);
                 addStartScreen();
             }
@@ -194,9 +197,11 @@ public class ControlPanel extends JPanel{
 
         closeButton.addActionListener(e -> {
             try {
-                Transform f = new Transform(argMap);
+                Transform transform = new Transform(argMap);
                 List<DataSet> dsList = new ArrayList<>(Collections.singletonList(dataSet));
-                graph.addRelation(new Relation(dsList,f));
+                DataSet transformed = transform.apply(dsList);
+                graph.addDataSet(transformed);
+                graph.addRelation(new Relation(dataSet,transform,transformed));
                 dialog.setVisible(false);
                 addStartScreen();
             }
@@ -215,10 +220,74 @@ public class ControlPanel extends JPanel{
     }
 
     private void joinDialog(DataSet dataSet){
-
+        final JDialog dialog = new JDialog(frame, "Select Datasets to join with", true);
+        List<DataSet> joinList = new ArrayList<>(Collections.singletonList(dataSet));
+        joinRefresh(dialog,joinList,dataSet);
     }
 
+    private void joinRefresh(JDialog dialog, List<DataSet> joinList, DataSet dataSet){
+        dialog.repaint();
 
+        JPanel optionPanel = new JPanel(new GridLayout(0,1));
+
+        for (DataSet set : graph.getDataSets()){
+            if (set != dataSet){
+                JButton optionButton = new JButton(set.getName());
+                optionButton.addActionListener(e ->{
+                    if (joinList.contains(set)){
+                        joinList.remove(set);
+                        System.out.println("REM");
+                        System.out.println(joinList);
+                        joinRefresh(dialog,joinList,dataSet);
+                    }
+                    else{
+                        joinList.add(set);
+                        System.out.println("ADD");
+                        System.out.println(joinList);
+                        joinRefresh(dialog,joinList,dataSet);
+                    }
+                });
+                optionPanel.add(optionButton);
+            }
+        }
+
+        JPanel selectedOptions = new JPanel(new GridLayout(0,1));
+
+        selectedOptions.add(new JLabel("SELECTED:"));
+        for (DataSet set : joinList){
+            if (set != dataSet) {
+                selectedOptions.add(new JLabel(set.getName()));
+            }
+        }
+
+        JButton closeButton = new JButton("JOIN");
+
+        closeButton.addActionListener(e -> {
+            if(joinList.size() > 1) {
+                Join joiner = new Join();
+                DataSet joined = joiner.apply(joinList);
+                graph.addDataSet(joined);
+
+                for (DataSet set : joinList) {
+                    graph.addRelation(new Relation(set,joiner,joined));
+                }
+
+                dialog.setVisible(false);
+                addStartScreen();
+            }
+            else{
+                JOptionPane.showMessageDialog(frame, "Need at least one other set to join with.");
+            }
+        });
+
+        optionPanel.add(selectedOptions);
+        optionPanel.add(closeButton);
+
+        dialog.setContentPane(optionPanel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(frame);
+        dialog.setVisible(true);
+    }
 
 
     private void addStartScreen(){
@@ -363,9 +432,7 @@ public class ControlPanel extends JPanel{
             if(verifyMap(argMap,options)){
                 try {
                     Collection<ClientPoint> dSet = dp.getCollection(argMap);
-                    System.out.println("gotcollection");
-                    graph.addDataSet(dSet);
-                    System.out.println("finished adding dataset");
+                    graph.addClientSet(dSet);
                     dialog.setVisible(false);
                     addStartScreen();
                 }

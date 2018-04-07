@@ -18,22 +18,25 @@ public class Main {
     private static final String ATTRIBUTE_LABEL = "Attributes";
 
     public static void main(String[] args) {
-        //testResourceSet();
-        new FrameworkGUI(new DataGraph());
+        testResourceSet();
+        //new FrameworkGUI(new DataGraph());
     }
 
-    public static void testResourceSet(){
+    /**
+     * GUI Dev-Mode method that initialises with existing hard-coded parsed dataSet
+     */
+    private static void testResourceSet(){
         DataPlugin CSV = PluginLoader.getDataPlugin("CSVReader");
         DataGraph dg = new DataGraph();
         Map<String,String> argMap = new HashMap<>();
-        argMap.put(FILE_PATH_LABEL,"resources/test.csv");
+        argMap.put(FILE_PATH_LABEL,"resources/test2.csv");
         argMap.put(X_LABEL,"X");
         argMap.put(Y_LABEL,"Y");
         argMap.put(T_LABEL,"Time");
         argMap.put(ATTRIBUTE_LABEL,"Wind,Light");
         try {
             Collection<ClientPoint> cx = CSV.getCollection(argMap);
-            dg.addDataSet(cx);
+            dg.addClientSet(cx);
             new FrameworkGUI(dg);
         }
         catch (Exception e){
