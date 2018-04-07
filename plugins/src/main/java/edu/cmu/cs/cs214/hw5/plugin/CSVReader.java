@@ -90,7 +90,7 @@ public class CSVReader implements DataPlugin {
                     attributeMap.put(attribute,Double.parseDouble((String) values.get(attribute)));
                 }
                 ClientPoint p = new ClientPoint(x,y,z,attributeMap);
-                System.out.println(p);
+                //System.out.println(p);
                 pointList.add(p);
             }
         }
@@ -100,8 +100,8 @@ public class CSVReader implements DataPlugin {
             }
         }
 
+        System.out.println("finished collxn");
         return pointList;
-
     }
 
 }

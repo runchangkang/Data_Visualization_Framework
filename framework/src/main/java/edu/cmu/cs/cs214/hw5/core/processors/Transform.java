@@ -5,6 +5,7 @@ import edu.cmu.cs.cs214.hw5.core.DataPoint;
 import edu.cmu.cs.cs214.hw5.core.DataSet;
 import edu.cmu.cs.cs214.hw5.core.GeoDataSet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,20 @@ public class Transform implements Processor{
      * Instantiate a new transform with a set of client-defined attribute transform expressions
      * @param transforms
      */
-    Transform (Map<String,TransformExpression> transforms){
-        this.transforms = new HashMap<>(transforms);
+    public Transform (Map<String,String> transforms){
+        Map<String,TransformExpression> parsedMap = new HashMap<>();
+
+        for (String key: transforms.keySet()){
+            if (!transforms.get(key).equals("") || !transforms.get(key).equals(" ")) {
+                TransformExpression exp = ExpressionParser.parseTransformExpression(transforms.get(key));
+                if (Double.isNaN(exp.apply(1))) {
+                    throw new IllegalArgumentException("Invalid expression produced NaN!");
+                }
+                parsedMap.put(key, exp);
+            }
+        }
+
+        this.transforms = new HashMap<>(parsedMap);
     }
 
     /**
@@ -34,23 +47,22 @@ public class Transform implements Processor{
     @Override
     public DataSet apply(List<DataSet> sources) {
         DataSet set = sources.get(0);                   //Transforms only apply to one source
-        Map<String, AttributeGroup> newSet = new HashMap<>();
 
-        for (String attr : set.getAttributes())
-            if (transforms.containsKey(attr)) {         //Transform the data the client has specified
-                TransformExpression transform = transforms.get(attr);
-                AttributeGroup groupToTransform = set.getAttributeGroup(attr);
-                AttributeGroup newGroup = new AttributeGroup(attr);
+        List<DataPoint> newList = new ArrayList<>();
 
-                for (DataPoint point : groupToTransform.getDataPoints()) {
-                    newGroup.addDataPoint(point.getX(), point.getY(), point.getT(), transform.apply(point.getAttr()));
+        for (DataPoint point : set.getDataPoints()) {
+
+            Map<String,Double> attrMap = new HashMap<>();
+            for (String ptAttribute : point.getAttributes()){
+                double value = point.getAttribute(ptAttribute);
+                if (transforms.containsKey(ptAttribute)){
+                    value = transforms.get(ptAttribute).apply(value);
                 }
-
-                newSet.put(attr, newGroup);
-            } else {                                    //Don't affect or remove the untransformed data in the set
-                newSet.put(attr, set.getAttributeGroup(attr));
+                attrMap.put(ptAttribute,value);
             }
+            newList.add(new DataPoint(point.getX(),point.getY(),point.getT(),attrMap));
+        }
 
-        return new GeoDataSet(newSet);
+        return new GeoDataSet(newList,set.getName() + "1");
     }
 }

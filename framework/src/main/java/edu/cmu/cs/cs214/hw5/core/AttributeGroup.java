@@ -7,8 +7,8 @@ import java.util.Collection;
  * given specific attribute type.
  */
 public class AttributeGroup {
-    private String type;
-    private ArrayList<DataPoint> dataPoints;
+    private final String type;
+    private ArrayList<DataPoint> dataPoints = new ArrayList<>();
 
     /**
      * Initializes the AttributeGroup class with the String representation of type
@@ -19,15 +19,10 @@ public class AttributeGroup {
     }
 
     /**
-     * Takes x, y, t, and attr value and adds it to the AttributeGroup instance
-     * @param x the x value of the data point
-     * @param y the y value of the data point
-     * @param t the time value of the data point
-     * @param attr the attribute associated with the given x y t
+     * @param point to add
      */
-    public void addDataPoint(double x, double y, double t, double attr){
-        DataPoint dp = new DataPoint(x, y, t, attr);
-        dataPoints.add(dp);
+    public void addDataPoint(DataPoint point){
+        dataPoints.add(point);
     }
 
     /**

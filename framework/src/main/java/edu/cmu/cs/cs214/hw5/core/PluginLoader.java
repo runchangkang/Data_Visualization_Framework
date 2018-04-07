@@ -31,6 +31,23 @@ public class PluginLoader {
     }
 
     /**
+     * Fetch a specific data source plugin based off of user input
+     * @param name plugin to fetch
+     * @return loaded
+     */
+    public static DataPlugin getDataPlugin(String name){
+
+        for (DataPlugin p : ServiceLoader.load(DataPlugin.class)){
+            if (name.equals(p.getName())){
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
      * @return List/Prints of all the currently loaded VisualPlugin implementations
      */
     public static List<String> listVisualPlugins() {
@@ -43,6 +60,22 @@ public class PluginLoader {
         }
 
         return pluginList;
+    }
+
+    /**
+     * Fetch a specific display plugin based off of user input
+     * @param name plugin to fetch
+     * @return loaded
+     */
+    public static VisualPlugin getVizPlugin(String name){
+
+        for (VisualPlugin p : ServiceLoader.load(VisualPlugin.class)){
+            if (name.equals(p.getName())){
+                return p;
+            }
+        }
+
+        return null;
     }
 }
 

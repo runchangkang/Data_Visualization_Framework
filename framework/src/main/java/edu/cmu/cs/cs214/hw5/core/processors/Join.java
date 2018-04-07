@@ -1,9 +1,11 @@
 package edu.cmu.cs.cs214.hw5.core.processors;
 
 import edu.cmu.cs.cs214.hw5.core.AttributeGroup;
+import edu.cmu.cs.cs214.hw5.core.DataPoint;
 import edu.cmu.cs.cs214.hw5.core.DataSet;
 import edu.cmu.cs.cs214.hw5.core.GeoDataSet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,19 +24,12 @@ public class Join implements Processor {
      */
     @Override
     public DataSet apply(List<DataSet> sources) {
-        Map<String, AttributeGroup > newSet = new HashMap<>();
+        List<DataPoint> newList = new ArrayList<>();
 
         for (DataSet set : sources){
-            for (String attr : set.getAttributes()){
-                if (newSet.containsKey(attr)){
-                    newSet.get(attr).addDataPoints(set.getAttributeGroup(attr).getDataPoints());
-                }
-                else{
-                    newSet.put(attr,set.getAttributeGroup(attr));
-                }
-            }
+            newList.addAll(set.getDataPoints());
         }
 
-        return new GeoDataSet(newSet);
+        return new GeoDataSet(newList,sources.get(0).getName() + "1");
     }
 }
