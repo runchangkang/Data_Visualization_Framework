@@ -36,7 +36,10 @@ public class ExpressionParser {
              */
         }
 
-        Argument x = new Argument(variables.get(0).toString(),-1); //Instantiate a base argument (never called)
+        Argument x = new Argument("x",0);
+        if (variables.size() > 0) {
+            x = new Argument(variables.get(0).toString(), -1); //Instantiate a base argument (never called)
+        }
         return new Expression(expression,x);
     }
 

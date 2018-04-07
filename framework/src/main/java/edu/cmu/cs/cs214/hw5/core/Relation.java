@@ -18,10 +18,11 @@ public class Relation {
      * @param sources DataSets to apply processing to
      * @param processor to apply processing with
      */
-    Relation(List<DataSet> sources, Processor processor){
+    public Relation(List<DataSet> sources, Processor processor){
         this.sources = new ArrayList<>(sources);
         this.processor = processor;
         this.target = processor.apply(this.sources);
+        target.printSet();
     }
 
     /**

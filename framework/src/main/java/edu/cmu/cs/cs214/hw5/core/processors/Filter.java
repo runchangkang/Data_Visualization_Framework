@@ -5,6 +5,7 @@ import edu.cmu.cs.cs214.hw5.core.DataPoint;
 import edu.cmu.cs.cs214.hw5.core.DataSet;
 import edu.cmu.cs.cs214.hw5.core.GeoDataSet;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,17 @@ public class Filter implements Processor {
      * Instantiate a new filter with a set of client-defined attribute filter expressions
      * @param filters
      */
-    Filter (Map<String,FilterExpression> filters){
-        this.filters = new HashMap<>(filters);
+    public Filter (Map<String,String> filters){
+        Map<String,FilterExpression> parsedMap = new HashMap<>();
+
+        for (String key: filters.keySet()){
+            if (!filters.get(key).equals("") || !filters.get(key).equals(" ")) {
+                FilterExpression exp = ExpressionParser.parseFilterExpression(filters.get(key));
+                parsedMap.put(key, exp);
+            }
+        }
+
+        this.filters = parsedMap;
     }
 
     /**
@@ -32,30 +42,31 @@ public class Filter implements Processor {
      * @param sources DataSet to apply filtering
      * @return newly filtered DataSet
      */
+
+    //apply all filters to all attributeSets
+
+
     @Override
     public DataSet apply(List<DataSet> sources) {
         DataSet set = sources.get(0);                   //Filters only apply to one source
-        Map<String, AttributeGroup> newSet = new HashMap<>();
 
-        for (String attr : set.getAttributes())
-            if (filters.containsKey(attr)) {            //Filter the data the client has specified
-                FilterExpression filter = filters.get(attr);
-                AttributeGroup groupToTransform = set.getAttributeGroup(attr);
-                AttributeGroup newGroup = new AttributeGroup(attr);
+        List<DataPoint> newList = new ArrayList<>();
 
-                for (DataPoint point : groupToTransform.getDataPoints()) {
-                    if (filter.apply(point.getAttr())){
-                        newGroup.addDataPoint(point.getX(), point.getY(), point.getT(), point.getAttr());
+        for (DataPoint point : set.getDataPoints()) {
+            boolean keep = true;
+            for (String key : filters.keySet()) {
+                if (point.hasAttr(key)) {
+                    if (!filters.get(key).apply(point.getAttribute(key))) {
+                        keep = false;
+                        break;
                     }
                 }
-
-                if(newGroup.size() > 0) {
-                    newSet.put(attr, newGroup);
-                }
-            } else {                                    //Don't affect or remove the unfiltered attributes in the set
-                newSet.put(attr, set.getAttributeGroup(attr));
             }
+            if (keep) {
+                newList.add(point);
+            }
+        }
 
-        return new GeoDataSet(newSet);
+        return new GeoDataSet(newList,set.getName() + "1");
     }
 }

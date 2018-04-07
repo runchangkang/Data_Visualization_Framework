@@ -1,5 +1,6 @@
 package edu.cmu.cs.cs214.hw5.core;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,8 +11,8 @@ public class GeoDataSet extends DataSet{
     /**
      * @param newSet new mapping to instantiate. possibly empty.
      */
-    public GeoDataSet (Map<String,AttributeGroup> newSet){
-        super(newSet);
+    public GeoDataSet (List<DataPoint> newSet, String name){
+        super(name,newSet);
     }
     /**
      * Takes in the x, y, t, and other data to create and store the point in the framework.
@@ -23,20 +24,8 @@ public class GeoDataSet extends DataSet{
      */
     @Override
     public void makePoint(double x, double y, double t, Map<String, Double> attributes) {
-        for(Map.Entry<String, Double> entry : attributes.entrySet()){
-            String type = entry.getKey();
-            Double attr = entry.getValue();
-            // If attributeGroup exists, just add to the appropriate attributeGroup
-            if(attributeGroups.containsKey(type)){
-               attributeGroups.get(type).addDataPoint(x,y,t, attr);
-            }
-            // If attributeGroup does not exist, create new and add to the attributeGroups
-            // and also add the new data point
-            else{
-                AttributeGroup attrGroup = new AttributeGroup(type);
-                attributeGroups.put(type, attrGroup);
-                attrGroup.addDataPoint(x,y,t,attr);
-            }
-        }
+        DataPoint newPoint = new DataPoint(x,y,t,attributes);
+        this.attributes.addAll(attributes.keySet());
+        this.pointSet.add(newPoint);
     }
 }

@@ -12,16 +12,16 @@ public class FrameworkGUI {
     /**
      * Invokes the GUI application on the EDT
      */
-    public FrameworkGUI() {
-        SwingUtilities.invokeLater(() -> createAndShowSetupScreen());
+    public FrameworkGUI(DataGraph graph) {
+        SwingUtilities.invokeLater(() -> createAndShowSetupScreen(graph));
     }
 
     /**
      * Creates a new GUI controller and launches it
      */
-    private void createAndShowSetupScreen() {
-        ControlPanel graph = new ControlPanel();
-        graph.launch(new DataGraph());
+    private void createAndShowSetupScreen(DataGraph graph) {
+        ControlPanel controller = new ControlPanel();
+        controller.launch(graph);
     }
 
 }

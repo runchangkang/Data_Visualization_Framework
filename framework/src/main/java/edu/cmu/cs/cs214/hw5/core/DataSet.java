@@ -1,8 +1,6 @@
 package edu.cmu.cs.cs214.hw5.core;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The DataSet interface which the client and the framework can see.
@@ -10,13 +8,19 @@ import java.util.Set;
  */
 public abstract class DataSet {
 
-    protected Map<String,AttributeGroup> attributeGroups;
+    //protected Map<String,AttributeGroup> attributeGroups;
+    protected Set<String> attributes = new HashSet<>();
+    protected List<DataPoint> pointSet = new ArrayList<>();
+    protected String name;
 
     /**
-     * @param setMap new DataSet with initial values
      */
-    public DataSet(Map<String,AttributeGroup> setMap){
-        this.attributeGroups = new HashMap<>(setMap);
+    public DataSet(String name, List<DataPoint> existingPoints){
+        this.pointSet.addAll(existingPoints);
+        for (DataPoint pt: existingPoints) {
+            attributes.addAll(pt.getAttributes());
+        }
+        this.name = name;
     }
 
     /**
@@ -33,14 +37,36 @@ public abstract class DataSet {
      * @return this dataset's container associated with that attribute
      */
     public AttributeGroup getAttributeGroup(String attribute){
-        return attributeGroups.get(attribute);
+        AttributeGroup newGroup = new AttributeGroup(attribute);
+        for (DataPoint pt : pointSet) {
+            if (pt.hasAttr(attribute)) {
+                newGroup.addDataPoint(pt);
+            }
+        }
+        return newGroup;
     }
 
     /**
      * @return all of the attributes this set currently contains
      */
     public Set<String> getAttributes(){
-        return attributeGroups.keySet();
+        return new HashSet<>(attributes);
     }
 
+    public String getName(){
+        return this.name;
+    }
+
+    public Collection<DataPoint> getDataPoints(){
+        return new ArrayList<>(this.pointSet);
+    }
+
+    public void printSet(){
+        System.out.println(name + " : " + pointSet.size() + " values");
+        for (DataPoint pt : pointSet){
+            System.out.println(pt);
+        }
+        System.out.println("\n");
+    }
 }
+

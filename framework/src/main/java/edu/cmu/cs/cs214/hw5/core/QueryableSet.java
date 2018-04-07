@@ -27,7 +27,7 @@ public class QueryableSet {
      * @return interpolated attribute value for this point.
      */
     public double querySet (int x, int y, int t, String attribute){
-        return dataSet.getAttributeGroup(attribute).getDataPoints().get(0).getAttr();
+        return dataSet.getAttributeGroup(attribute).getDataPoints().get(0).getAttribute(attribute);
     }
 
     /**
