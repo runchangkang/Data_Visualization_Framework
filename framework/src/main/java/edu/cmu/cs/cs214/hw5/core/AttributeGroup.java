@@ -20,17 +20,38 @@ public class AttributeGroup {
 
     /**
      * @param point to add
+     * @exception IllegalArgumentException in case the point is not compatible with the attrgroup
      */
     public void addDataPoint(DataPoint point){
-        dataPoints.add(point);
+        if(checkCompatibility(point)){
+            dataPoints.add(point);
+        }
+        else{
+            throw new IllegalArgumentException("Point not compatible with AttrGroup type");
+        }
     }
 
     /**
      * Adds multiple, already-instantiated DataPoints into an attribute group
-     * @param points
+     * @param points collection of points to be added to the attribute group
+     * @exception IllegalArgumentException in case the point is not compatible with the attrgroup
      */
     public void addDataPoints(Collection<DataPoint> points){
+        for(DataPoint point : points){
+            if(!checkCompatibility(point)){
+                throw new IllegalArgumentException("Point not compatible with AttrGroup type");
+            }
+        }
         dataPoints.addAll(points);
+    }
+
+    /**
+     *
+     * @param point takes in a datapoint
+     * @return boolean value indicating whether the input point is compatible
+     */
+    private boolean checkCompatibility(DataPoint point){
+        return point.hasAttr(this.type);
     }
 
     /**
