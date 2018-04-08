@@ -6,14 +6,28 @@ import edu.cmu.cs.cs214.hw5.core.DataSet;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Controller for drawing and performing datagraph manipulations
+ */
 public class GraphController {
 
     private ControlPanel cp;
 
+    /**
+     * Instantiates a new graph controller
+     * @param cp controlPanel instance to draw on
+     */
     GraphController(ControlPanel cp){
         this.cp = cp;
     }
 
+    /**
+     * Panel that draws the datagraph
+     * @param graph to draw
+     * @param height allowed of graph
+     * @param width allowed of graph
+     * @return drawn panel w/ buttons & listeners
+     */
     JPanel drawGraph(DataGraph graph, int height, int width){
         JPanel gPanel = new JPanel(new GridLayout(0, 1));
 
@@ -29,7 +43,6 @@ public class GraphController {
             button.setSize(new Dimension(width,pHeight/4));
             button.addActionListener( e -> cp.transDialog(set));
 
-
             relPanel.add(name);
             relPanel.add(button);
             relPanel.setSize(new Dimension(width, pHeight));
@@ -44,12 +57,12 @@ public class GraphController {
             gPanel.setBackground(Color.gray);
         }
 
+        //extra buffer space
         for (int i = 0; i < 6 - graph.getRelations().size(); i++){
             JPanel bufPanel = new JPanel();
             bufPanel.setSize(new Dimension(width, pHeight));
             gPanel.add(bufPanel);
         }
-
 
         gPanel.setSize(new Dimension(width,height));
         gPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK,4));

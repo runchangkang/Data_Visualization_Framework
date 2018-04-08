@@ -12,17 +12,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controls importing DataSets with Data Plugins
+ */
 public class ImportController {
 
     private String selectedDataPlugin;
     private DataGraph graph;
     private ControlPanel cp;
 
+    /**
+     * Defines a new import controller
+     * @param cp controlPanel instance to work with
+     * @param graph datagraph to import to
+     */
     ImportController(ControlPanel cp, DataGraph graph){
         this.cp = cp;
         this.graph = graph;
     }
 
+    /**
+     * Pops up a dialog with the data plugin selection interface
+     * @param dataPluginList list of data plugins to select from
+     * @param frame to pop above
+     */
     void dataSetDialog(List<String> dataPluginList, JFrame frame){
         final JDialog dialog = new JDialog(frame, "Select a DataSet Plugin", true);
         selectedDataPlugin = null; //reset
@@ -53,6 +66,11 @@ public class ImportController {
         ControlPanel.display(dialog,optionPanel,frame);
     }
 
+    /**
+     * Pops up a dialog with the parameters requested by a particular data plugin
+     * @param selectedDataPlugin (Name of) plugin
+     * @param frame to pop above
+     */
     private void dataPluginDialog(String selectedDataPlugin, JFrame frame){
         DataPlugin dp = PluginLoader.getDataPlugin(selectedDataPlugin);
         List<String> options = dp.getPopupParameters();
@@ -90,7 +108,12 @@ public class ImportController {
         ControlPanel.display(dialog,optionPanel,frame);
     }
 
-
+    /**
+     * Checks that an argument map at least contains something. Completion, not correctness.
+     * @param argMap map to check
+     * @param options required contents
+     * @return correctly filled map?
+     */
     private static boolean verifyMap(Map<String,String> argMap, List<String> options){
         for (String option : options){
             if(!argMap.containsKey(option)){

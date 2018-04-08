@@ -12,26 +12,42 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Controller class for data processing dialogs and operations
+ */
 public class ProcessorController {
 
-    ControlPanel cp;
-    JFrame frame;
+    private ControlPanel cp;
+    private JFrame frame;
 
     ProcessorController(ControlPanel cp, JFrame frame){
         this.cp = cp;
         this.frame = frame;
     }
 
+    /**
+     * Frames initial popup of join dialog
+     * @param dataSet that triggered the join operation
+     * @param graph being joined
+     */
     void joinDialog(DataSet dataSet, DataGraph graph){
         final JDialog dialog = new JDialog(frame, "Select Datasets to join with", true);
         List<DataSet> joinList = new ArrayList<>(Collections.singletonList(dataSet));
         joinRefresh(dialog,joinList,dataSet,graph);
     }
 
+    /**
+     * Refreshable dialog of join operation (Recalled per joinList update)
+     * @param dialog to refresh
+     * @param joinList list of dataSets being joined
+     * @param dataSet set that triggered the join operation
+     * @param graph being joined
+     */
     private void joinRefresh(JDialog dialog, List<DataSet> joinList, DataSet dataSet, DataGraph graph){
         dialog.repaint();
 
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
+        optionPanel.add(new JLabel("  Select DataSets to join with:  "));
 
         for (DataSet set : graph.getDataSets()){
             if (set != dataSet){
@@ -56,7 +72,7 @@ public class ProcessorController {
 
         JPanel selectedOptions = new JPanel(new GridLayout(0,1));
 
-        selectedOptions.add(new JLabel("SELECTED:"));
+        selectedOptions.add(new JLabel("SELECTED: "));
         for (DataSet set : joinList){
             if (set != dataSet) {
                 selectedOptions.add(new JLabel(set.getName()));
@@ -64,7 +80,6 @@ public class ProcessorController {
         }
 
         JButton closeButton = new JButton("JOIN");
-
         closeButton.addActionListener(e -> {
             if(joinList.size() > 1) {
                 Join joiner = new Join();
@@ -89,6 +104,11 @@ public class ProcessorController {
     }
 
     //Todo: extract these to an outer function
+    /**
+     * Filtering interface popup
+     * @param dataSet being filtered
+     * @param graph to create new set on
+     */
     void filterDialog(DataSet dataSet, DataGraph graph){
         final JDialog dialog = new JDialog(frame, "Define filter expressions", true);
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
@@ -120,6 +140,11 @@ public class ProcessorController {
         ControlPanel.display(dialog,optionPanel,frame);
     }
 
+    /**
+     * Transformation interface popup
+     * @param dataSet to transform
+     * @param graph to create new set on
+     */
     void transformDialog(DataSet dataSet,DataGraph graph){
         final JDialog dialog = new JDialog(frame, "Define transform expressions", true);
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
