@@ -30,8 +30,10 @@ public class Join implements Processor {
         for (DataSet set : sources){
             newList.addAll(set.getDataPoints());
             names.append(set.getName());
-            names.append(" ");
+            names.append(" & ");
         }
+        names.deleteCharAt(names.length()-2);
+        names.deleteCharAt(names.length()-1);
 
         return new GeoDataSet(newList,names.toString());
     }

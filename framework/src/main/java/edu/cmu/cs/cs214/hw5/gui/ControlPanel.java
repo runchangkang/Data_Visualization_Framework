@@ -4,10 +4,6 @@ import javax.swing.*;
 import java.util.*;
 
 import edu.cmu.cs.cs214.hw5.core.*;
-import edu.cmu.cs.cs214.hw5.core.processors.Filter;
-import edu.cmu.cs.cs214.hw5.core.processors.Join;
-import edu.cmu.cs.cs214.hw5.core.processors.Transform;
-
 import java.awt.*;
 import java.util.List;
 
@@ -19,9 +15,7 @@ public class ControlPanel extends JPanel{
 
     private JFrame frame;
     private DataGraph graph;
-    private String label;
-    private String selectedDataPlugin;
-    private String selectedVizPlugin;
+    private GraphController gc;
     private List<String> dataPluginList;
     private List<String> vizPluginList;
 
@@ -35,11 +29,11 @@ public class ControlPanel extends JPanel{
 
     public void launch(DataGraph graph){
         this.graph = graph;
+        this.gc = new GraphController(this);
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.dataPluginList = PluginLoader.listDataPlugins();
         this.vizPluginList = PluginLoader.listVisualPlugins();
-
 
         addStartScreen();
         frame.setTitle("GeoFilter Framework");
@@ -50,247 +44,52 @@ public class ControlPanel extends JPanel{
         this.frame = frame;
     }
 
-    private JPanel drawGraph(DataGraph graph, int height, int width){
-        JPanel gPanel = new JPanel(new GridLayout(0, 1));
-
-        int pHeight = Math.min(50,height / ((graph.getRelations().size() * 2 )+ 1));
-
-        for (DataSet set : graph.getDataSets()) {
-            JPanel relPanel = new JPanel(new GridLayout(0, 1));
-            JLabel name = new JLabel(set.getName());
-            name.setHorizontalAlignment(JLabel.CENTER);
-            name.setHorizontalTextPosition(JLabel.CENTER);
-
-            JButton button = new JButton("applyFilter");
-            button.setSize(new Dimension(width,pHeight/4));
-            button.addActionListener( e -> transDialog(set));
-
-
-            relPanel.add(name);
-            relPanel.add(button);
-            relPanel.setSize(new Dimension(width, pHeight));
-            relPanel.setBackground(Color.gray);
-            relPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE,10,true));
-
-            gPanel.add(relPanel);
-
-            JPanel bufPanel = new JPanel();
-            bufPanel.setSize(new Dimension(width, pHeight));
-            gPanel.add(bufPanel);
-            gPanel.setBackground(Color.gray);
-        }
-
-        for (int i = 0; i < 6 - graph.getRelations().size(); i++){
-            JPanel bufPanel = new JPanel();
-            bufPanel.setSize(new Dimension(width, pHeight));
-            gPanel.add(bufPanel);
-        }
-
-
-        gPanel.setSize(new Dimension(width,height));
-        gPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK,4));
-        return gPanel;
-    }
-
-    private void transDialog(DataSet dataSet){
-        final JDialog dialog = new JDialog(frame,
-                "Processing Data",
-                true);
+    //todo: add clearer selections states to these button
+     void transDialog(DataSet dataSet){
+        final JDialog dialog = new JDialog(frame, "Processing Data", true);
+        ProcessorController pc = new ProcessorController(this,frame);
 
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
 
         JButton fButton = new JButton("Filter");
-        fButton.addActionListener(e -> {dialog.setVisible(false);filterDialog(dataSet);});
+        fButton.addActionListener(e -> {dialog.setVisible(false);pc.filterDialog(dataSet,graph);});
         optionPanel.add(fButton);
 
         JButton tButton = new JButton("Transform");
-        tButton.addActionListener(e -> {dialog.setVisible(false);transformDialog(dataSet);});
+        tButton.addActionListener(e -> {dialog.setVisible(false);pc.transformDialog(dataSet,graph);});
         optionPanel.add(tButton);
 
         JButton jButton = new JButton("Join");
-        jButton.addActionListener(e -> {dialog.setVisible(false);joinDialog(dataSet);});
+        jButton.addActionListener(e -> {dialog.setVisible(false);pc.joinDialog(dataSet,graph);});
         optionPanel.add(jButton);
 
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
+        display(dialog,optionPanel,frame);
     }
 
-//Todo: extract these to an outer function
-    private void filterDialog(DataSet dataSet){
-        final JDialog dialog = new JDialog(frame,
-                "Define filter expressions",
-                true);
+    static void paramFieldSet(Collection<String> args, Map<String,String> argMap, JPanel container){
+        JPanel wrapper = new JPanel(new BorderLayout());
+        JPanel labelPanel = new JPanel(new GridLayout(0,1));
+        JPanel fieldPanel = new JPanel(new GridLayout(0,1));
 
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-
-        Map<String,String> argMap = new HashMap<>();
-
-        for (String parameter : dataSet.getAttributes()){
-            JPanel paramPanel = new JPanel();
-            JLabel paramLabel = new JLabel(parameter);
-            JTextField paramValue = new JTextField(30);
+        for (String parameter : args){
+            JLabel paramLabel = new JLabel(parameter,SwingConstants.RIGHT);
+            JTextField paramValue = new JTextField(25);
             paramValue.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusGained(java.awt.event.FocusEvent evt) { }
                 public void focusLost(java.awt.event.FocusEvent evt) {
                     argMap.put(parameter,paramValue.getText());
                 }
             });
-            paramPanel.add(paramLabel);
-            paramPanel.add(paramValue);
-            optionPanel.add(paramPanel);
+            labelPanel.add(paramLabel);
+            fieldPanel.add(paramValue);
         }
 
-        JButton closeButton = new JButton("APPLY");
-
-        //todo: move the graph application logic entirely into datagraph class
-        closeButton.addActionListener(e -> {
-            try {
-                Filter f = new Filter(argMap);
-                List<DataSet> dsList = new ArrayList<>(Collections.singletonList(dataSet));
-                DataSet filtered = f.apply(dsList);
-                graph.addDataSet(filtered);
-                graph.addRelation(new Relation(dataSet,f,filtered));
-                dialog.setVisible(false);
-                addStartScreen();
-            }
-            catch (Exception e2){
-                e2.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "An error occurred while processing data. Please try again.");
-            }
-        });
-
-
-        optionPanel.add(closeButton);
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
+        wrapper.add(labelPanel,BorderLayout.WEST);
+        wrapper.add(fieldPanel,BorderLayout.CENTER);
+        container.add(wrapper);
     }
 
-    private void transformDialog(DataSet dataSet){
-        final JDialog dialog = new JDialog(frame,
-                "Define transform expressions",
-                true);
-
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-
-        Map<String,String> argMap = new HashMap<>();
-
-        for (String parameter : dataSet.getAttributes()){
-            JPanel paramPanel = new JPanel();
-            JLabel paramLabel = new JLabel(parameter);
-            JTextField paramValue = new JTextField(30);
-            paramValue.addFocusListener(new java.awt.event.FocusAdapter() {
-                public void focusGained(java.awt.event.FocusEvent evt) { }
-                public void focusLost(java.awt.event.FocusEvent evt) {
-                    argMap.put(parameter,paramValue.getText());
-                }
-            });
-            paramPanel.add(paramLabel);
-            paramPanel.add(paramValue);
-            optionPanel.add(paramPanel);
-        }
-
-        JButton closeButton = new JButton("APPLY");
-
-        closeButton.addActionListener(e -> {
-            try {
-                Transform transform = new Transform(argMap);
-                List<DataSet> dsList = new ArrayList<>(Collections.singletonList(dataSet));
-                DataSet transformed = transform.apply(dsList);
-                graph.addDataSet(transformed);
-                graph.addRelation(new Relation(dataSet,transform,transformed));
-                dialog.setVisible(false);
-                addStartScreen();
-            }
-            catch (Exception e2){
-                e2.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "An error occurred while processing data. Please try again.");
-            }
-        });
-
-
-        optionPanel.add(closeButton);
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
-    }
-
-    private void joinDialog(DataSet dataSet){
-        final JDialog dialog = new JDialog(frame, "Select Datasets to join with", true);
-        List<DataSet> joinList = new ArrayList<>(Collections.singletonList(dataSet));
-        joinRefresh(dialog,joinList,dataSet);
-    }
-
-    private void joinRefresh(JDialog dialog, List<DataSet> joinList, DataSet dataSet){
-        dialog.repaint();
-
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-
-        for (DataSet set : graph.getDataSets()){
-            if (set != dataSet){
-                JButton optionButton = new JButton(set.getName());
-                optionButton.addActionListener(e ->{
-                    if (joinList.contains(set)){
-                        joinList.remove(set);
-                        System.out.println("REM");
-                        System.out.println(joinList);
-                        joinRefresh(dialog,joinList,dataSet);
-                    }
-                    else{
-                        joinList.add(set);
-                        System.out.println("ADD");
-                        System.out.println(joinList);
-                        joinRefresh(dialog,joinList,dataSet);
-                    }
-                });
-                optionPanel.add(optionButton);
-            }
-        }
-
-        JPanel selectedOptions = new JPanel(new GridLayout(0,1));
-
-        selectedOptions.add(new JLabel("SELECTED:"));
-        for (DataSet set : joinList){
-            if (set != dataSet) {
-                selectedOptions.add(new JLabel(set.getName()));
-            }
-        }
-
-        JButton closeButton = new JButton("JOIN");
-
-        closeButton.addActionListener(e -> {
-            if(joinList.size() > 1) {
-                Join joiner = new Join();
-                DataSet joined = joiner.apply(joinList);
-                graph.addDataSet(joined);
-
-                for (DataSet set : joinList) {
-                    graph.addRelation(new Relation(set,joiner,joined));
-                }
-
-                dialog.setVisible(false);
-                addStartScreen();
-            }
-            else{
-                JOptionPane.showMessageDialog(frame, "Need at least one other set to join with.");
-            }
-        });
-
-        optionPanel.add(selectedOptions);
-        optionPanel.add(closeButton);
-
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
-    }
-
-
-    private void addStartScreen(){
+     void addStartScreen(){
         this.removeAll();
         this.repaint();
 
@@ -315,6 +114,7 @@ public class ControlPanel extends JPanel{
             dataPanel.add(new JButton(plugin));
         }
 
+        //todo: make the load button actually do something
         dataPanel.add(new JButton("LOAD"));
         dataPanel.setPreferredSize(new Dimension(PLUGIN_WIDTH,WINDOW_HEIGHT/2));
 
@@ -337,11 +137,7 @@ public class ControlPanel extends JPanel{
 
     private JPanel graphWindow(){
         JPanel panel = new JPanel(new BorderLayout());
-        /*
-        JButton button = new JButton("Graph Window");
-        button.setPreferredSize(new Dimension(GRAPH_WIDTH,WINDOW_HEIGHT-100)); */
-        //panel.add(button,BorderLayout.CENTER);
-        panel.add(drawGraph(graph,WINDOW_HEIGHT-100,GRAPH_WIDTH));
+        panel.add(gc.drawGraph(graph,WINDOW_HEIGHT-100,GRAPH_WIDTH));
         panel.add(createButton(),BorderLayout.SOUTH);
         panel.setPreferredSize(new Dimension(GRAPH_WIDTH,WINDOW_HEIGHT));
         return panel;
@@ -359,108 +155,16 @@ public class ControlPanel extends JPanel{
 
     private JButton createButton(){
         JButton button = new JButton("Create");
-        button.addActionListener(e -> dataSetDialog());
+        ImportController ic = new ImportController(this,graph);
+        button.addActionListener(e -> ic.dataSetDialog(dataPluginList,frame));
         return button;
     }
 
-    private void setLabel(String s){
-        System.out.println(s);
-        this.label = s;
+
+    static void display(JDialog d,JComponent content, JFrame frame){
+        d.setContentPane(content);
+        d.pack();
+        d.setLocationRelativeTo(frame);
+        d.setVisible(true);
     }
-
-    private void dataSetDialog(){
-        final JDialog dialog = new JDialog(frame,
-                "Select a DataSet Plugin",
-                true);
-
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-
-        for (String pluginName : dataPluginList){
-            JButton button = new JButton(pluginName);
-            button.addActionListener(e -> {
-                this.selectedDataPlugin = pluginName;
-                System.out.println(this.selectedDataPlugin);});
-            optionPanel.add(button);
-        }
-
-        JButton closeButton = new JButton("NEXT");
-        closeButton.addActionListener(e -> {
-            if(selectedDataPlugin != null) {
-                dialog.setVisible(false);
-                dataPluginDialog();
-            }
-        });
-        optionPanel.add(closeButton);
-
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
-    }
-
-    private void dataPluginDialog(){
-        DataPlugin dp = PluginLoader.getDataPlugin(this.selectedDataPlugin);
-        List<String> options = dp.getPopupParameters();
-
-        final JDialog dialog = new JDialog(frame,
-                "Select a DataSet Plugin",
-                true);
-
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-
-        Map<String,String> argMap = new HashMap<>();
-
-        for (String parameter : options){
-            JPanel paramPanel = new JPanel();
-            JLabel paramLabel = new JLabel(parameter);
-            JTextField paramValue = new JTextField(30);
-            paramValue.addFocusListener(new java.awt.event.FocusAdapter() {
-                public void focusGained(java.awt.event.FocusEvent evt) { }
-                public void focusLost(java.awt.event.FocusEvent evt) {
-                    argMap.put(parameter,paramValue.getText());
-                }
-            });
-            paramPanel.add(paramLabel);
-            paramPanel.add(paramValue);
-            optionPanel.add(paramPanel);
-        }
-
-
-        JButton closeButton = new JButton("CREATE");
-
-        closeButton.addActionListener(e -> {
-            if(verifyMap(argMap,options)){
-                try {
-                    Collection<ClientPoint> dSet = dp.getCollection(argMap);
-                    graph.addClientSet(dSet);
-                    dialog.setVisible(false);
-                    addStartScreen();
-                }
-                catch (Exception e2){
-                    e2.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, "An error occurred while processing data. Please try again.");
-                    //System.out.println("Wasn't able to parse data.");
-                }
-            }
-        });
-        optionPanel.add(closeButton);
-
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
-    }
-
-    private boolean verifyMap(Map<String,String> argMap, List<String> options){
-        for (String option : options){
-            if(!argMap.containsKey(option)){
-                return false;
-            }
-            if ("".equals(argMap.get(option))){
-                return false;
-            }
-        }
-        return true;
-    }
-
 }

@@ -16,6 +16,7 @@ public interface VisualPlugin {
      */
     String getName();
 
+    //todo: integrate these with the GUI
     /**
      * @return a list of parameters that contain useful information regarding the data visualisation
      */
