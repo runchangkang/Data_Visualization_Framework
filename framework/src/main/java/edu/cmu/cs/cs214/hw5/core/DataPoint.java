@@ -67,7 +67,9 @@ public class DataPoint {
     }
 
     /**
-     * @return attribute value
+     *
+     * @param name the name of the attribute in string format
+     * @return the actual attribute value
      */
     public double getAttribute(String name) {
         if(name.equals(X_ATTRIB)){
@@ -90,6 +92,11 @@ public class DataPoint {
         throw new IllegalArgumentException("Point does not have this attribute.");
     }
 
+    /**
+     *
+     * @param name the name of the attribute in string format
+     * @return whether the attribute exists in the point
+     */
     public boolean hasAttr(String name){
         if (name.equals(X_ATTRIB) || name.equals(Y_ATTRIB) || name.equals(T_ATTRIB)){
             return true;
@@ -102,10 +109,18 @@ public class DataPoint {
         return false;
     }
 
+    /**
+     *
+     * @return all the attributes in the datapoint instance as a list of strings
+     */
     public List<String> getAttributes(){
         return new ArrayList<>(Arrays.asList(attrNames));
     }
 
+    /**
+     *
+     * @return The string representation of the datapoint as a useful tool for debugging
+     */
     @Override
     public String toString() {
         String s = "X: " + new DecimalFormat("####.##").format(x) + "\t" +
