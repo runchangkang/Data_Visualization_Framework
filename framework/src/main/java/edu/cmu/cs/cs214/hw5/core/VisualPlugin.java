@@ -1,6 +1,7 @@
 package edu.cmu.cs.cs214.hw5.core;
 
 import javax.swing.*;
+import java.util.Map;
 
 
 /**
@@ -20,7 +21,7 @@ public interface VisualPlugin {
     /**
      * @return a list of parameters that contain useful information regarding the data visualisation
      */
-    ParameterList addInterfaceParameters();
+    public ParameterList addInterfaceParameters();
 
     /**
      * Draw the JPanel. This gives the client flexibility to use whatever library they desire
@@ -29,5 +30,5 @@ public interface VisualPlugin {
      * @param y dimension that JPanel will be sized to
      * @return fully drawn JPanel
      */
-    JPanel drawSet(QueryableSet qSet, int x, int y);
+    JPanel drawSet(QueryableSet qSet, int x, int y, Map<String,Double> results);
 }

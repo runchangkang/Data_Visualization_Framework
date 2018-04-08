@@ -6,11 +6,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
-import edu.cmu.cs.cs214.hw5.core.DataGraph;
-import edu.cmu.cs.cs214.hw5.core.DataSet;
-import edu.cmu.cs.cs214.hw5.core.PluginLoader;
+import edu.cmu.cs.cs214.hw5.core.*;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -136,12 +135,49 @@ public class ControlPanel extends JPanel{
      */
     private JPanel vizWindow(){
         JPanel panel = new JPanel(new BorderLayout());
-        JButton params = new JButton("Parameters");
-        params.setPreferredSize(new Dimension(VIZ_WIDTH,100));
-        panel.add(params,BorderLayout.NORTH);
-        panel.add(new JButton("Visual Window"),BorderLayout.CENTER);
-        panel.setPreferredSize(new Dimension(VIZ_WIDTH,WINDOW_HEIGHT));
+
+        if (vizPluginList.size() == 0) {
+            JButton params = new JButton("Parameters");
+            params.setPreferredSize(new Dimension(VIZ_WIDTH, 100));
+            panel.add(params, BorderLayout.NORTH);
+            panel.add(new JButton("Visual Window"), BorderLayout.CENTER);
+            panel.setPreferredSize(new Dimension(VIZ_WIDTH, WINDOW_HEIGHT));
+        }
+        else{
+            VisualPlugin plugin = PluginLoader.getVizPlugin(vizPluginList.get(0));
+
+            Map<String,Double> argMap = new HashMap<>();
+
+            JPanel container = new JPanel();
+
+            JPanel params = new JPanel(new GridLayout(0,2));
+            for (Parameter p : plugin.addInterfaceParameters().getParameters()){
+                argMap.put(p.getName(),(p.getMin() + p.getMax()) / 2);
+                JLabel label = new JLabel(p.getName());
+                JSlider slider = new JSlider((int) p.getMin(), (int) p.getMax());
+                slider.addChangeListener( e ->{
+                    container.removeAll();
+                    argMap.put(p.getName(),(double) slider.getValue());
+                    container.add(drawViz(plugin,argMap));
+                    container.revalidate();
+                    container.repaint();
+                });
+                params.add(label);
+                params.add(slider);
+            }
+            panel.add(params,BorderLayout.NORTH);
+
+            JPanel drawnViz = drawViz(plugin,argMap);
+            container.add(drawnViz);
+            panel.add(container,BorderLayout.CENTER);
+            panel.setPreferredSize(new Dimension(VIZ_WIDTH,WINDOW_HEIGHT));
+        }
         return panel;
+    }
+
+    private JPanel drawViz(VisualPlugin plugin,Map<String,Double> argMap){
+        return plugin.drawSet(new QueryableSet(graph.getDataSets().get(0)),
+                VIZ_WIDTH,WINDOW_HEIGHT-100,argMap);
     }
 
 

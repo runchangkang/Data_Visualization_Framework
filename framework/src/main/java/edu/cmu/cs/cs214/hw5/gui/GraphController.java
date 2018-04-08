@@ -98,6 +98,10 @@ public class GraphController {
         return gPanel;
     }
 
+    /**
+     * GraphPanel will draw lines btwn all of the components (inside it) that it is given
+     * This should hypothetically work with gridbaglayout too
+     */
     class GraphPanel extends JPanel{
 
         JComponent[] compSet;

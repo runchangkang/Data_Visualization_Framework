@@ -23,7 +23,7 @@ public class ParameterList {
     /**
      * @return snapshot of currently instantiated parameters
      */
-    List<Parameter> getParameters(){
+    public List<Parameter> getParameters(){
         return new ArrayList<>(parameterList);
     }
 }
