@@ -14,6 +14,9 @@ public abstract class DataSet {
     protected String name;
 
     /**
+     *
+     * @param name name of the Data Set
+     * @param existingPoints the already existing datapoints to use for the dataset
      */
     public DataSet(String name, List<DataPoint> existingPoints){
         if(existingPoints != null) {
@@ -35,7 +38,7 @@ public abstract class DataSet {
     public abstract void makePoint(double x, double y, double t, Map<String, Double> attributes);
 
     /**
-     * @param attribute to get
+     * @param attribute the string attribute
      * @return this dataset's container associated with that attribute
      */
     public AttributeGroup getAttributeGroup(String attribute){
@@ -55,14 +58,25 @@ public abstract class DataSet {
         return new HashSet<>(attributes);
     }
 
+    /**
+     *
+     * @return the name of the dataset in string
+     */
     public String getName(){
         return this.name;
     }
 
+    /**
+     *
+     * @return all datapoints in the dataset
+     */
     public Collection<DataPoint> getDataPoints(){
         return new ArrayList<>(this.pointSet);
     }
 
+    /**
+     * Prints the pointset for debugging purpose
+     */
     public void printSet(){
         System.out.println(name + " : " + pointSet.size() + " values");
         for (DataPoint pt : pointSet){
