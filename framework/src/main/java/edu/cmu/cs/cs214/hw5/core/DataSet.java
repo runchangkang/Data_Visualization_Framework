@@ -61,6 +61,10 @@ public abstract class DataSet {
         return new ArrayList<>(this.pointSet);
     }
 
+    public int size(){
+        return pointSet.size();
+    }
+
     public void printSet(){
         System.out.println(name + " : " + pointSet.size() + " values");
         for (DataPoint pt : pointSet){

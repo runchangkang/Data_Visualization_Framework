@@ -1,6 +1,7 @@
 package edu.cmu.cs.cs214.hw5.gui;
 
 import edu.cmu.cs.cs214.hw5.core.DataGraph;
+import edu.cmu.cs.cs214.hw5.core.DataPoint;
 import edu.cmu.cs.cs214.hw5.core.DataSet;
 import edu.cmu.cs.cs214.hw5.core.Relation;
 import edu.cmu.cs.cs214.hw5.core.processors.Filter;
@@ -31,7 +32,7 @@ public class ProcessorController {
      * @param graph being joined
      */
     void joinDialog(DataSet dataSet, DataGraph graph){
-        final JDialog dialog = new JDialog(frame, "Select Datasets to join with", true);
+        final JDialog dialog = new JDialog(frame, "Join Selection", true);
         List<DataSet> joinList = new ArrayList<>(Collections.singletonList(dataSet));
         joinRefresh(dialog,joinList,dataSet,graph);
     }
@@ -100,6 +101,7 @@ public class ProcessorController {
 
         optionPanel.add(selectedOptions);
         optionPanel.add(closeButton);
+        optionPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
         ControlPanel.display(dialog,optionPanel,frame);
     }
 
@@ -110,11 +112,13 @@ public class ProcessorController {
      * @param graph to create new set on
      */
     void filterDialog(DataSet dataSet, DataGraph graph){
-        final JDialog dialog = new JDialog(frame, "Define filter expressions", true);
+        final JDialog dialog = new JDialog(frame, "Define Filter Expressions", true);
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
 
         Map<String,String> argMap = new HashMap<>();
-        ControlPanel.paramFieldSet(dataSet.getAttributes(),argMap,optionPanel);
+        List<String> defaultSet = new ArrayList<>(Arrays.asList(DataPoint.X_ATTRIB,DataPoint.Y_ATTRIB,DataPoint.T_ATTRIB));
+        defaultSet.addAll(dataSet.getAttributes());
+        ControlPanel.paramFieldSet(defaultSet,argMap,optionPanel);
 
         JButton closeButton = new JButton("APPLY");
 
@@ -137,6 +141,7 @@ public class ProcessorController {
         });
 
         optionPanel.add(closeButton);
+        optionPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
         ControlPanel.display(dialog,optionPanel,frame);
     }
 
@@ -146,7 +151,7 @@ public class ProcessorController {
      * @param graph to create new set on
      */
     void transformDialog(DataSet dataSet,DataGraph graph){
-        final JDialog dialog = new JDialog(frame, "Define transform expressions", true);
+        final JDialog dialog = new JDialog(frame, "Define Transform Expressions", true);
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
         Map<String,String> argMap = new HashMap<>();
         ControlPanel.paramFieldSet(dataSet.getAttributes(),argMap,optionPanel);
@@ -169,7 +174,7 @@ public class ProcessorController {
             }
         });
         optionPanel.add(closeButton);
-
+        optionPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
         ControlPanel.display(dialog,optionPanel,frame);
     }
 

@@ -11,6 +11,11 @@ import java.util.Map;
  * Has x, y, time, and attribute value.
  */
 public class DataPoint {
+
+    public static final String X_ATTRIB = "X";
+    public static final String Y_ATTRIB = "Y";
+    public static final String T_ATTRIB = "T";
+
     private double x;
     private double y;
     private double t;
@@ -65,15 +70,30 @@ public class DataPoint {
      * @return attribute value
      */
     public double getAttribute(String name) {
-        for (int i = 0; i < attrNames.length; i++){
-            if (attrNames[i].equals(name)){
-                return attr[i];
+        if(name.equals(X_ATTRIB)){
+            return x;
+        }
+        else if(name.equals(Y_ATTRIB)){
+            return y;
+        }
+        else if(name.equals(T_ATTRIB)){
+            return t;
+        }
+        else {
+            for (int i = 0; i < attrNames.length; i++) {
+                if (attrNames[i].equals(name)) {
+                    return attr[i];
+                }
             }
         }
+
         throw new IllegalArgumentException("Point does not have this attribute.");
     }
 
     public boolean hasAttr(String name){
+        if (name.equals(X_ATTRIB) || name.equals(Y_ATTRIB) || name.equals(T_ATTRIB)){
+            return true;
+        }
         for (String attribute : attrNames){
             if (attribute.equals(name)){
                 return true;

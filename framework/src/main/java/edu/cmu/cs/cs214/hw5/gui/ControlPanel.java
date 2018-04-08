@@ -1,14 +1,6 @@
 package edu.cmu.cs.cs214.hw5.gui;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -216,6 +208,8 @@ public class ControlPanel extends JPanel{
             fieldPanel.add(paramValue);
         }
 
+        labelPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        fieldPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         wrapper.add(labelPanel,BorderLayout.WEST);
         wrapper.add(fieldPanel,BorderLayout.CENTER);
         container.add(wrapper);
