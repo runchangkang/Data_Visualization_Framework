@@ -59,6 +59,7 @@ public abstract class DataSet {
     }
 
     /**
+     * @return unique name of dataset
      *
      * @return the name of the dataset in string
      */
@@ -75,6 +76,13 @@ public abstract class DataSet {
     }
 
     /**
+     * @return number of datapoints in the set
+     */
+    public int size(){
+        return pointSet.size();
+    }
+  
+    /** 
      * Prints the pointset for debugging purpose
      */
     public void printSet(){

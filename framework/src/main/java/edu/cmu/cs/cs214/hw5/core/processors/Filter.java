@@ -25,7 +25,7 @@ public class Filter implements Processor {
         Map<String,FilterExpression> parsedMap = new HashMap<>();
 
         for (String key: filters.keySet()){
-            if (!filters.get(key).equals("") || !filters.get(key).equals(" ")) {
+            if (!filters.get(key).equals("") && !filters.get(key).equals(" ")) {
                 FilterExpression exp = ExpressionParser.parseFilterExpression(filters.get(key));
                 parsedMap.put(key, exp);
             }
@@ -67,6 +67,17 @@ public class Filter implements Processor {
             }
         }
 
-        return new GeoDataSet(newList,set.getName() + "1");
+        return new GeoDataSet(newList,"f" + incrementNumber(set.getName()));
+    }
+
+    private static String incrementNumber(String s){
+        char[] arr = s.toCharArray();
+        if (Character.isDigit(arr[arr.length -1])){
+            int x = Integer.parseInt(String.valueOf(arr[arr.length -1]));
+            x++;
+            String result = String.valueOf(arr,0,arr.length-1);
+            return result + x;
+        }
+        return s + "1";
     }
 }

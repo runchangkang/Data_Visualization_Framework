@@ -1,6 +1,5 @@
 package edu.cmu.cs.cs214.hw5.core.processors;
 
-import edu.cmu.cs.cs214.hw5.core.AttributeGroup;
 import edu.cmu.cs.cs214.hw5.core.DataPoint;
 import edu.cmu.cs.cs214.hw5.core.DataSet;
 import edu.cmu.cs.cs214.hw5.core.GeoDataSet;
@@ -24,7 +23,7 @@ public class Transform implements Processor{
         Map<String,TransformExpression> parsedMap = new HashMap<>();
 
         for (String key: transforms.keySet()){
-            if (!transforms.get(key).equals("") || !transforms.get(key).equals(" ")) {
+            if (!transforms.get(key).equals("") && !transforms.get(key).equals(" ")) {
                 TransformExpression exp = ExpressionParser.parseTransformExpression(transforms.get(key));
                 if (Double.isNaN(exp.apply(1))) {
                     throw new IllegalArgumentException("Invalid expression produced NaN!");
@@ -63,6 +62,17 @@ public class Transform implements Processor{
             newList.add(new DataPoint(point.getX(),point.getY(),point.getT(),attrMap));
         }
 
-        return new GeoDataSet(newList,set.getName() + "1");
+        return new GeoDataSet(newList,"t"+incrementNumber(set.getName()));
+    }
+
+    private static String incrementNumber(String s){
+        char[] arr = s.toCharArray();
+        if (Character.isDigit(arr[arr.length -1])){
+            int x = Integer.parseInt(String.valueOf(arr[arr.length -1]));
+            x++;
+            String result = String.valueOf(arr,0,arr.length-1);
+            return result + x;
+        }
+        return s + "1";
     }
 }

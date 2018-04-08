@@ -1,44 +1,52 @@
 package edu.cmu.cs.cs214.hw5.gui;
 
 import javax.swing.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 
 import edu.cmu.cs.cs214.hw5.core.*;
-import edu.cmu.cs.cs214.hw5.core.processors.Filter;
-import edu.cmu.cs.cs214.hw5.core.processors.Transform;
 
-import java.awt.*;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
- * Dummy GUI implementation to test layout and loading
+ * GUI implementation to test layout and loading
  */
 public class ControlPanel extends JPanel{
 
     private JFrame frame;
     private DataGraph graph;
-    private String label;
-    private String selectedDataPlugin;
-    private String selectedVizPlugin;
+    private GraphController gc;
+    private ProcessorController pc;
     private List<String> dataPluginList;
     private List<String> vizPluginList;
+    private String selectedVizPlugin;
+    private DataSet selectedVizSet;
 
     private static final int WINDOW_WIDTH = 1000;
     private static final int WINDOW_HEIGHT = 600;
-
     private static final int PLUGIN_WIDTH = 200;
     private static final int GRAPH_WIDTH = 200;
-
     private static final int VIZ_WIDTH = WINDOW_WIDTH - PLUGIN_WIDTH - GRAPH_WIDTH;
 
+    /**
+     * Sets up frame and initialises the controllers. Imports any found plugins.
+     * @param graph existing datagraph to visualise
+     */
     public void launch(DataGraph graph){
-        this.graph = graph;
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         this.dataPluginList = PluginLoader.listDataPlugins();
         this.vizPluginList = PluginLoader.listVisualPlugins();
-
+        this.gc = new GraphController(this);
+        this.graph = graph;
+        this.pc = new ProcessorController(this,frame);
 
         addStartScreen();
         frame.setTitle("GeoFilter Framework");
@@ -49,179 +57,10 @@ public class ControlPanel extends JPanel{
         this.frame = frame;
     }
 
-    private JPanel drawGraph(DataGraph graph, int height, int width){
-        JPanel gPanel = new JPanel(new GridLayout(0, 1));
-
-        int pHeight = Math.min(50,height / ((graph.getRelations().size() * 2 )+ 1));
-        System.out.println(pHeight);
-
-        for (Relation rel : graph.getRelations()) {
-            JPanel relPanel = new JPanel(new GridLayout(0, 1));
-            JLabel name = new JLabel(rel.getSources().get(0).getName());
-            name.setHorizontalAlignment(JLabel.CENTER);
-            name.setHorizontalTextPosition(JLabel.CENTER);
-
-            JButton button = new JButton("applyFilter");
-            button.setSize(new Dimension(width,pHeight/4));
-            button.addActionListener( e -> transDialog(rel.getResult()));
-
-
-            relPanel.add(name);
-            relPanel.add(button);
-            relPanel.setSize(new Dimension(width, pHeight));
-            relPanel.setBackground(Color.gray);
-            relPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE,10,true));
-
-            gPanel.add(relPanel);
-
-            JPanel bufPanel = new JPanel();
-            bufPanel.setSize(new Dimension(width, pHeight));
-            gPanel.add(bufPanel);
-            gPanel.setBackground(Color.gray);
-        }
-
-        for (int i = 0; i < 6 - graph.getRelations().size(); i++){
-            JPanel bufPanel = new JPanel();
-            bufPanel.setSize(new Dimension(width, pHeight));
-            gPanel.add(bufPanel);
-        }
-
-
-        gPanel.setSize(new Dimension(width,height));
-        gPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK,4));
-        return gPanel;
-    }
-
-    private void transDialog(DataSet dataSet){
-        final JDialog dialog = new JDialog(frame,
-                "Processing Data",
-                true);
-
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-
-        JButton fButton = new JButton("Filter");
-        fButton.addActionListener(e -> {dialog.setVisible(false);filterDialog(dataSet);});
-        optionPanel.add(fButton);
-
-        JButton tButton = new JButton("Transform");
-        tButton.addActionListener(e -> {dialog.setVisible(false);transformDialog(dataSet);});
-        optionPanel.add(tButton);
-
-        JButton jButton = new JButton("Join");
-        jButton.addActionListener(e -> {dialog.setVisible(false);joinDialog(dataSet);});
-        optionPanel.add(jButton);
-
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
-    }
-
-//Todo: extract these to an outer function
-    private void filterDialog(DataSet dataSet){
-        final JDialog dialog = new JDialog(frame,
-                "Define filter expressions",
-                true);
-
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-
-        Map<String,String> argMap = new HashMap<>();
-
-        for (String parameter : dataSet.getAttributes()){
-            JPanel paramPanel = new JPanel();
-            JLabel paramLabel = new JLabel(parameter);
-            JTextField paramValue = new JTextField(30);
-            paramValue.addFocusListener(new java.awt.event.FocusAdapter() {
-                public void focusGained(java.awt.event.FocusEvent evt) { }
-                public void focusLost(java.awt.event.FocusEvent evt) {
-                    argMap.put(parameter,paramValue.getText());
-                }
-            });
-            paramPanel.add(paramLabel);
-            paramPanel.add(paramValue);
-            optionPanel.add(paramPanel);
-        }
-
-        JButton closeButton = new JButton("APPLY");
-
-        closeButton.addActionListener(e -> {
-            try {
-                Filter f = new Filter(argMap);
-                List<DataSet> dsList = new ArrayList<>(Collections.singletonList(dataSet));
-                graph.addRelation(new Relation(dsList,f));
-                dialog.setVisible(false);
-                addStartScreen();
-            }
-            catch (Exception e2){
-                e2.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "An error occurred while processing data. Please try again.");
-            }
-        });
-
-
-        optionPanel.add(closeButton);
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
-    }
-
-    private void transformDialog(DataSet dataSet){
-        final JDialog dialog = new JDialog(frame,
-                "Define transform expressions",
-                true);
-
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-
-        Map<String,String> argMap = new HashMap<>();
-
-        for (String parameter : dataSet.getAttributes()){
-            JPanel paramPanel = new JPanel();
-            JLabel paramLabel = new JLabel(parameter);
-            JTextField paramValue = new JTextField(30);
-            paramValue.addFocusListener(new java.awt.event.FocusAdapter() {
-                public void focusGained(java.awt.event.FocusEvent evt) { }
-                public void focusLost(java.awt.event.FocusEvent evt) {
-                    argMap.put(parameter,paramValue.getText());
-                }
-            });
-            paramPanel.add(paramLabel);
-            paramPanel.add(paramValue);
-            optionPanel.add(paramPanel);
-        }
-
-        JButton closeButton = new JButton("APPLY");
-
-        closeButton.addActionListener(e -> {
-            try {
-                Transform f = new Transform(argMap);
-                List<DataSet> dsList = new ArrayList<>(Collections.singletonList(dataSet));
-                graph.addRelation(new Relation(dsList,f));
-                dialog.setVisible(false);
-                addStartScreen();
-            }
-            catch (Exception e2){
-                e2.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "An error occurred while processing data. Please try again.");
-            }
-        });
-
-
-        optionPanel.add(closeButton);
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
-    }
-
-    private void joinDialog(DataSet dataSet){
-
-    }
-
-
-
-
-    private void addStartScreen(){
+    /**
+     * Main window layout and setup
+     */
+    void addStartScreen(){
         this.removeAll();
         this.repaint();
 
@@ -237,26 +76,32 @@ public class ControlPanel extends JPanel{
         this.revalidate();
     }
 
+    /**
+     * Plugin sidebar layout and setup. Displays loaded plugins from
+     * @return JPanel with plugin window
+     */
     private JPanel pluginWindow(){
         JPanel panel = new JPanel(new GridLayout(0,1));
         JPanel dataPanel = new JPanel(new GridLayout(0,1));
         dataPanel.add(new JLabel("Data Plugins"));
 
-        for (String plugin : dataPluginList){
-            dataPanel.add(new JButton(plugin));
-        }
+        for (String plugin : dataPluginList){ dataPanel.add(new JButton(plugin)); }
 
-        dataPanel.add(new JButton("LOAD"));
         dataPanel.setPreferredSize(new Dimension(PLUGIN_WIDTH,WINDOW_HEIGHT/2));
 
         JPanel vizPanel = new JPanel(new GridLayout(0,1));
         vizPanel.add(new JLabel("Visual Plugins"));
 
-        for (String plugin : vizPluginList){
-            vizPanel.add(new JButton(plugin));
-        }
+        for (String plugin : vizPluginList){ vizPanel.add(new JButton(plugin)); }
 
-        vizPanel.add(new JButton("LOAD"));
+        JButton loadPluginButton = new JButton("Load Plugins");
+        loadPluginButton.addActionListener(e -> {
+            this.dataPluginList = PluginLoader.listDataPlugins();
+            this.vizPluginList = PluginLoader.listVisualPlugins();
+            addStartScreen();
+        });
+
+        vizPanel.add(loadPluginButton);
         vizPanel.setPreferredSize(new Dimension(PLUGIN_WIDTH,WINDOW_HEIGHT/2));
 
         panel.add(dataPanel);
@@ -266,134 +111,207 @@ public class ControlPanel extends JPanel{
         return panel;
     }
 
+    /**
+     * @return JPanel with the graph manipulation interface
+     */
     private JPanel graphWindow(){
         JPanel panel = new JPanel(new BorderLayout());
-        /*
-        JButton button = new JButton("Graph Window");
-        button.setPreferredSize(new Dimension(GRAPH_WIDTH,WINDOW_HEIGHT-100)); */
-        //panel.add(button,BorderLayout.CENTER);
-        panel.add(drawGraph(graph,WINDOW_HEIGHT-100,GRAPH_WIDTH));
+        panel.add(gc.drawGraph(graph,WINDOW_HEIGHT-100,GRAPH_WIDTH));
         panel.add(createButton(),BorderLayout.SOUTH);
         panel.setPreferredSize(new Dimension(GRAPH_WIDTH,WINDOW_HEIGHT));
         return panel;
     }
 
-    private JPanel vizWindow(){
-        JPanel panel = new JPanel(new BorderLayout());
-        JButton params = new JButton("Parameters");
-        params.setPreferredSize(new Dimension(VIZ_WIDTH,100));
-        panel.add(params,BorderLayout.NORTH);
-        panel.add(new JButton("Visual Window"),BorderLayout.CENTER);
-        panel.setPreferredSize(new Dimension(VIZ_WIDTH,WINDOW_HEIGHT));
-        return panel;
-    }
-
+    /**
+     * @return Button to import a new dataset
+     */
     private JButton createButton(){
         JButton button = new JButton("Create");
-        button.addActionListener(e -> dataSetDialog());
+        ImportController ic = new ImportController(this,graph);
+        button.addActionListener(e -> ic.dataSetDialog(dataPluginList,frame));
         return button;
     }
 
-    private void setLabel(String s){
-        System.out.println(s);
-        this.label = s;
+    /**
+     * MAIN METHOD FOR VISUALISATION PLUGIN IMPLEMENTATION
+     * //Todo: Only works with one visualisation right now. hack it to work with multiple? // overlay?
+     *          -> swing has something called glasspanel which might allow call paintComponent of diff panel over other
+     * //Todo: MOVE INTO VIZCONTROLLER CLASS
+     *
+     * @return JPanel with the visualisation interface
+     */
+    private JPanel vizWindow(){
+        JPanel panel = new JPanel(new BorderLayout());
+
+        //Default case: a visualisation has not yet been initialised
+        if (selectedVizSet == null || selectedVizPlugin == null) {
+            JButton params = new JButton("Parameters");
+            params.setPreferredSize(new Dimension(VIZ_WIDTH, 100));
+            panel.add(params, BorderLayout.NORTH);
+            panel.add(new JButton("Visual Window"), BorderLayout.CENTER);
+            panel.setPreferredSize(new Dimension(VIZ_WIDTH, WINDOW_HEIGHT));
+        }
+        else{  //okok Let's draw it!
+            VisualPlugin plugin = PluginLoader.getVizPlugin(vizPluginList.get(0));
+
+            Map<String,Double> argMap = new HashMap<>();
+
+
+            JPanel container = new JPanel();
+
+            /* Logic: The visualisation is contained within the container panel.
+             *     -> A reference is kept to the container panel by the slider listener
+             *     -> argMap is initialised to standard but can be changed (just like the text popups)
+             *     -> The container is reset and fully redrawn with new argMap on slider change
+             */
+
+            JPanel params = new JPanel(new GridLayout(0,2));
+            for (Parameter p : plugin.addInterfaceParameters().getParameters()){
+                argMap.put(p.getName(), (p.getMin() + p.getMax()) / 2);
+                JLabel label = new JLabel(p.getName());
+                JSlider slider = new JSlider((int) p.getMin(), (int) p.getMax());
+                slider.addChangeListener( e ->{
+                    container.removeAll();
+                    argMap.put(p.getName(),(double) slider.getValue());
+                    container.add(drawViz(plugin,argMap));
+                    container.revalidate();
+                    container.repaint();
+                });
+                params.add(label);
+                params.add(slider);
+            }
+            panel.add(params,BorderLayout.NORTH);
+
+
+            JPanel drawnViz = drawViz(plugin,argMap);
+            container.add(drawnViz);
+            panel.add(container,BorderLayout.CENTER);
+            panel.setPreferredSize(new Dimension(VIZ_WIDTH,WINDOW_HEIGHT));
+        }
+
+        return panel;
     }
 
-    private void dataSetDialog(){
-        final JDialog dialog = new JDialog(frame,
-                "Select a DataSet Plugin",
-                true);
+    /**
+     * Redraw the visualisation the plugin's method / reparameterized argmap
+     * @param plugin to visualise with
+     * @param argMap parameters to use
+     * @return drawn JPanel
+     */
+    private JPanel drawViz(VisualPlugin plugin,Map<String,Double> argMap){
+        return plugin.drawSet(new QueryableSet(selectedVizSet),
+                VIZ_WIDTH,WINDOW_HEIGHT-100,argMap);
+    }
+
+    //todo: add clearer selections states to these buttons (also applx in selectedVizPlugin
+    /**
+     * Defines button to apply processing to a dataset
+     * @param dataSet to apply transform to
+     */
+    void transDialog(DataSet dataSet){
+        final JDialog dialog = new JDialog(frame, "Processing Data", true);
 
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
 
-        for (String pluginName : dataPluginList){
+        JButton fButton = new JButton("Filter");
+        fButton.addActionListener(e -> {dialog.setVisible(false);pc.filterDialog(dataSet,graph);});
+        optionPanel.add(fButton);
+
+        JButton tButton = new JButton("Transform");
+        tButton.addActionListener(e -> {dialog.setVisible(false);pc.transformDialog(dataSet,graph);});
+        optionPanel.add(tButton);
+
+        JButton jButton = new JButton("Join");
+        jButton.addActionListener(e -> {dialog.setVisible(false);pc.joinDialog(dataSet,graph);});
+        optionPanel.add(jButton);
+
+        display(dialog,optionPanel,frame);
+    }
+
+    /**
+     * Sets the current dataSet to visualise. Perhaps use multiple?
+     * @param ds
+     */
+    public void setSelectedVizSet(DataSet ds){
+        this.selectedVizSet = ds;
+    }
+
+    /**
+     * Popup dialog to set controlPanel's visualization plugin from the available options
+     */
+    public void getSelectedVizPlugin(){
+        final JDialog dialog = new JDialog(frame, "Select a Visualisation Plugin", true);
+        selectedVizPlugin = null; //reset
+
+        JPanel optionPanel = new JPanel(new GridLayout(0,1));
+        optionPanel.add(new JLabel("  Select a Visual Plugin from the loaded list.  "));
+
+        for (String pluginName : vizPluginList){
             JButton button = new JButton(pluginName);
             button.addActionListener(e -> {
-                this.selectedDataPlugin = pluginName;
-                System.out.println(this.selectedDataPlugin);});
+                this.selectedVizPlugin = pluginName;
+                System.out.println(this.selectedVizPlugin);});
             optionPanel.add(button);
         }
 
-        JButton closeButton = new JButton("NEXT");
+        JButton closeButton = new JButton("VISUALIZE");
         closeButton.addActionListener(e -> {
-            if(selectedDataPlugin != null) {
+            if(selectedVizPlugin != null) {
                 dialog.setVisible(false);
-                dataPluginDialog();
+                addStartScreen();
+            }
+            else{
+                JOptionPane.showMessageDialog(dialog, "Please select a visual plugin.");
             }
         });
         optionPanel.add(closeButton);
 
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
+        display(dialog,optionPanel,frame);
     }
 
-    private void dataPluginDialog(){
-        DataPlugin dp = PluginLoader.getDataPlugin(this.selectedDataPlugin);
-        List<String> options = dp.getPopupParameters();
 
-        final JDialog dialog = new JDialog(frame,
-                "Select a DataSet Plugin",
-                true);
+    /**
+     * Global dialog popup function
+     * @param d dialog to popup
+     * @param content to place in the dialog
+     * @param frame to popup above
+     */
+    static void display(JDialog d,JComponent content, JFrame frame){
+        d.setContentPane(content);
+        d.pack();
+        d.setLocationRelativeTo(frame);
+        d.setVisible(true);
+    }
 
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
+    /**
+     * Define a text-field popup to get multiple text parameters from the user
+     * @param args labels to get
+     * @param argMap returned arguments
+     * @param container JPanel to be placed in
+     */
+    //todo: tweak to not be stupid (see container)
+    static void paramFieldSet(Collection<String> args, Map<String,String> argMap, JPanel container){
+        JPanel wrapper = new JPanel(new BorderLayout());
+        JPanel labelPanel = new JPanel(new GridLayout(0,1));
+        JPanel fieldPanel = new JPanel(new GridLayout(0,1));
 
-        Map<String,String> argMap = new HashMap<>();
-
-        for (String parameter : options){
-            JPanel paramPanel = new JPanel();
-            JLabel paramLabel = new JLabel(parameter);
-            JTextField paramValue = new JTextField(30);
+        for (String parameter : args){
+            JLabel paramLabel = new JLabel(parameter,SwingConstants.RIGHT);
+            JTextField paramValue = new JTextField(25);
             paramValue.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusGained(java.awt.event.FocusEvent evt) { }
                 public void focusLost(java.awt.event.FocusEvent evt) {
                     argMap.put(parameter,paramValue.getText());
                 }
             });
-            paramPanel.add(paramLabel);
-            paramPanel.add(paramValue);
-            optionPanel.add(paramPanel);
+            labelPanel.add(paramLabel);
+            fieldPanel.add(paramValue);
         }
 
-
-        JButton closeButton = new JButton("CREATE");
-
-        closeButton.addActionListener(e -> {
-            if(verifyMap(argMap,options)){
-                try {
-                    Collection<ClientPoint> dSet = dp.getCollection(argMap);
-                    System.out.println("gotcollection");
-                    graph.addDataSet(dSet);
-                    System.out.println("finished adding dataset");
-                    dialog.setVisible(false);
-                    addStartScreen();
-                }
-                catch (Exception e2){
-                    e2.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, "An error occurred while processing data. Please try again.");
-                    //System.out.println("Wasn't able to parse data.");
-                }
-            }
-        });
-        optionPanel.add(closeButton);
-
-        dialog.setContentPane(optionPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
+        labelPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        fieldPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        wrapper.add(labelPanel,BorderLayout.WEST);
+        wrapper.add(fieldPanel,BorderLayout.CENTER);
+        container.add(wrapper);
     }
-
-    private boolean verifyMap(Map<String,String> argMap, List<String> options){
-        for (String option : options){
-            if(!argMap.containsKey(option)){
-                return false;
-            }
-            if ("".equals(argMap.get(option))){
-                return false;
-            }
-        }
-        return true;
-    }
-
 }

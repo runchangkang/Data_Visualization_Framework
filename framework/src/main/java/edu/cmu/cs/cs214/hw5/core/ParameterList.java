@@ -11,7 +11,7 @@ public class ParameterList {
     private List<Parameter> parameterList = new ArrayList<>();
 
     /**
-     * Adds a new parameter to the list
+     * Adds a new parameter to the list. Framework takes care of display, value, and init.
      * @param name label
      * @param min value of parameter
      * @param max value of parameter
@@ -23,7 +23,7 @@ public class ParameterList {
     /**
      * @return snapshot of currently instantiated parameters
      */
-    List<Parameter> getParameters(){
+    public List<Parameter> getParameters(){
         return new ArrayList<>(parameterList);
     }
 }
