@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+	compile 'com.google.code.gson:gson:2.8.2'
     compile name: 'super-csv-2.4.0'
     compile project(':framework')
     testCompile 'junit:junit:4.12'
