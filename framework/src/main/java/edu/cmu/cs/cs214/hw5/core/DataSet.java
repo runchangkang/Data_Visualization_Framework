@@ -16,9 +16,11 @@ public abstract class DataSet {
     /**
      */
     public DataSet(String name, List<DataPoint> existingPoints){
-        this.pointSet.addAll(existingPoints);
-        for (DataPoint pt: existingPoints) {
-            attributes.addAll(pt.getAttributes());
+        if(existingPoints != null) {
+            this.pointSet.addAll(existingPoints);
+            for (DataPoint pt : existingPoints) {
+                attributes.addAll(pt.getAttributes());
+            }
         }
         this.name = name;
     }
