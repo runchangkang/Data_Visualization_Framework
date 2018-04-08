@@ -136,7 +136,6 @@ public class GraphController {
                 Point2D.Double p1 = getCenter(c[j]);
                 for(int k = j+1; k < c.length; k++) {
                     Point2D p2 = getCenter(c[k]);
-                    System.out.println(p1 + " -> " + p2);
                     g2d.setStroke(new BasicStroke(2f));
                     g2d.draw(new Line2D.Double(p1, p2));
                 }

@@ -79,6 +79,8 @@ public class ImportController {
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
 
         //todo: have argmap add in a name option for the client to name their dataset
+        //todo: prevent viz full redraw by not calling addstartscreen just graphArea container redraw
+        //      -- alternatively hotfix by save params
         Map<String,String> argMap = new HashMap<>();
 
         ControlPanel.paramFieldSet(options,argMap,optionPanel);

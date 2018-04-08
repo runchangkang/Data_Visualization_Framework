@@ -156,6 +156,7 @@ public class ControlPanel extends JPanel{
 
             Map<String,Double> argMap = new HashMap<>();
 
+
             JPanel container = new JPanel();
 
             /* Logic: The visualisation is contained within the container panel.
@@ -166,7 +167,7 @@ public class ControlPanel extends JPanel{
 
             JPanel params = new JPanel(new GridLayout(0,2));
             for (Parameter p : plugin.addInterfaceParameters().getParameters()){
-                argMap.put(p.getName(),(p.getMin() + p.getMax()) / 2);
+                argMap.put(p.getName(), (p.getMin() + p.getMax()) / 2);
                 JLabel label = new JLabel(p.getName());
                 JSlider slider = new JSlider((int) p.getMin(), (int) p.getMax());
                 slider.addChangeListener( e ->{
@@ -180,6 +181,7 @@ public class ControlPanel extends JPanel{
                 params.add(slider);
             }
             panel.add(params,BorderLayout.NORTH);
+
 
             JPanel drawnViz = drawViz(plugin,argMap);
             container.add(drawnViz);
