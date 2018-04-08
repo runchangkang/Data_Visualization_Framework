@@ -2,11 +2,22 @@ package edu.cmu.cs.cs214.hw5.gui;
 
 import edu.cmu.cs.cs214.hw5.core.DataGraph;
 import edu.cmu.cs.cs214.hw5.core.DataSet;
-import edu.cmu.cs.cs214.hw5.core.Relation;
 
-import javax.swing.*;
-import javax.xml.crypto.Data;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
@@ -26,7 +37,9 @@ public class GraphController {
     }
 
     /**
-     * Panel that draws the datagraph
+     * Panel that draws the datagraph.
+     * //Todo: Use GridBagLayout and draw to the actual relationships
+     *
      * @param graph to draw
      * @param height allowed of graph
      * @param width allowed of graph
@@ -50,6 +63,7 @@ public class GraphController {
             name.setHorizontalAlignment(JLabel.CENTER);
             name.setHorizontalTextPosition(JLabel.CENTER);
 
+            //add main label
             JPanel sWrap = new JPanel();
             JLabel size = new JLabel(set.size() + " elements");
             size.setHorizontalAlignment(JLabel.CENTER);
@@ -60,51 +74,52 @@ public class GraphController {
             sWrap.setBorder(BorderFactory.createEmptyBorder(12,12,12,12));
             sWrap.setPreferredSize(new Dimension(width,pHeight/2));
 
-            JButton button = new JButton("applyFilter");
-            button.setSize(new Dimension(width,pHeight/4));
-            button.addActionListener( e -> cp.transDialog(set));
+            //filter/transform button
+            JButton fbutton = new JButton("applyProcessing");
+            fbutton.setSize(new Dimension(width,pHeight/4));
+            fbutton.addActionListener( e -> cp.transDialog(set));
 
+            //visualisation button
+            JButton vbutton = new JButton("applyVisual");
+            vbutton.setSize(new Dimension(width,pHeight/4));
+            vbutton.addActionListener( e -> {
+                cp.setSelectedVizSet(set);
+                cp.getSelectedVizPlugin();
+            });
+
+            //graphics
             relPanel.add(name);
             relPanel.add(size);
-            relPanel.add(button);
-            //relPanel.setMaximumSize(new Dimension(width, pHeight));
+            relPanel.add(fbutton);
+            relPanel.add(vbutton);
             relPanel.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.BLACK,2,true),
                         BorderFactory.createEmptyBorder(5,5,5,5)));
-            //relPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE,10,true));
 
             gPanel.add(relPanel);
             compSet[j] = relPanel;
             j++;
         }
-        gPanel.addCompSet(compSet);
+        gPanel.addCompSet(compSet); //gives the gPanel the graph components to draw //todo: add relationships
 
         //extra buffer space
-
         for (int i = 0; i < 4 - graph.getRelations().size(); i++){
             JPanel bufPanel = new JPanel();
             bufPanel.setSize(new Dimension(width, pHeight));
             gPanel.add(bufPanel);
         }
-
         gPanel.setSize(new Dimension(width,height));
-        //JPanel bufPanel = new JPanel();
-        //bufPanel.setPreferredSize(new Dimension(width,height));
-
         containerPanel.add(gPanel,BorderLayout.NORTH);
-        //containerPanel.add(bufPanel,BorderLayout.CENTER);
-
-        //gPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK,2));
         return gPanel;
     }
 
     /**
      * GraphPanel will draw lines btwn all of the components (inside it) that it is given
-     * This should hypothetically work with gridbaglayout too
+     * This should hypothetically work with GridBag too if there aren't overlaps
      */
     class GraphPanel extends JPanel{
 
-        JComponent[] compSet;
+        private JComponent[] compSet; //components to draw
 
         GraphPanel(GridLayout layout){
             super(layout);

@@ -1,6 +1,5 @@
 package edu.cmu.cs.cs214.hw5.core.processors;
 
-import edu.cmu.cs.cs214.hw5.core.AttributeGroup;
 import edu.cmu.cs.cs214.hw5.core.DataPoint;
 import edu.cmu.cs.cs214.hw5.core.DataSet;
 import edu.cmu.cs.cs214.hw5.core.GeoDataSet;
@@ -63,7 +62,7 @@ public class Transform implements Processor{
             newList.add(new DataPoint(point.getX(),point.getY(),point.getT(),attrMap));
         }
 
-        return new GeoDataSet(newList,incrementNumber(set.getName()));
+        return new GeoDataSet(newList,"t"+incrementNumber(set.getName()));
     }
 
     private static String incrementNumber(String s){

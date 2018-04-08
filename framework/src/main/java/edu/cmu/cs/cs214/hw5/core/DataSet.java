@@ -53,14 +53,23 @@ public abstract class DataSet {
         return new HashSet<>(attributes);
     }
 
+    /**
+     * @return unique name of dataset
+     */
     public String getName(){
         return this.name;
     }
 
+    /**
+     * @return all datapoints in the set
+     */
     public Collection<DataPoint> getDataPoints(){
         return new ArrayList<>(this.pointSet);
     }
 
+    /**
+     * @return number of datapoints in the set
+     */
     public int size(){
         return pointSet.size();
     }

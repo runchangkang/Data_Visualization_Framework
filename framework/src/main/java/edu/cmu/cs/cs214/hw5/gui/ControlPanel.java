@@ -25,6 +25,8 @@ public class ControlPanel extends JPanel{
     private ProcessorController pc;
     private List<String> dataPluginList;
     private List<String> vizPluginList;
+    private String selectedVizPlugin;
+    private DataSet selectedVizSet;
 
     private static final int WINDOW_WIDTH = 1000;
     private static final int WINDOW_HEIGHT = 600;
@@ -131,24 +133,36 @@ public class ControlPanel extends JPanel{
     }
 
     /**
+     * MAIN METHOD FOR VISUALISATION PLUGIN IMPLEMENTATION
+     * //Todo: Only works with one visualisation right now. hack it to work with multiple? // overlay?
+     *          -> swing has something called glasspanel which might allow call paintComponent of diff panel over other
+     * //Todo: MOVE INTO VIZCONTROLLER CLASS
+     *
      * @return JPanel with the visualisation interface
      */
     private JPanel vizWindow(){
         JPanel panel = new JPanel(new BorderLayout());
 
-        if (vizPluginList.size() == 0) {
+        //Default case: a visualisation has not yet been initialised
+        if (selectedVizSet == null || selectedVizPlugin == null) {
             JButton params = new JButton("Parameters");
             params.setPreferredSize(new Dimension(VIZ_WIDTH, 100));
             panel.add(params, BorderLayout.NORTH);
             panel.add(new JButton("Visual Window"), BorderLayout.CENTER);
             panel.setPreferredSize(new Dimension(VIZ_WIDTH, WINDOW_HEIGHT));
         }
-        else{
+        else{  //okok Let's draw it!
             VisualPlugin plugin = PluginLoader.getVizPlugin(vizPluginList.get(0));
 
             Map<String,Double> argMap = new HashMap<>();
 
             JPanel container = new JPanel();
+
+            /* Logic: The visualisation is contained within the container panel.
+             *     -> A reference is kept to the container panel by the slider listener
+             *     -> argMap is initialised to standard but can be changed (just like the text popups)
+             *     -> The container is reset and fully redrawn with new argMap on slider change
+             */
 
             JPanel params = new JPanel(new GridLayout(0,2));
             for (Parameter p : plugin.addInterfaceParameters().getParameters()){
@@ -172,16 +186,22 @@ public class ControlPanel extends JPanel{
             panel.add(container,BorderLayout.CENTER);
             panel.setPreferredSize(new Dimension(VIZ_WIDTH,WINDOW_HEIGHT));
         }
+
         return panel;
     }
 
+    /**
+     * Redraw the visualisation the plugin's method / reparameterized argmap
+     * @param plugin to visualise with
+     * @param argMap parameters to use
+     * @return drawn JPanel
+     */
     private JPanel drawViz(VisualPlugin plugin,Map<String,Double> argMap){
-        return plugin.drawSet(new QueryableSet(graph.getDataSets().get(0)),
+        return plugin.drawSet(new QueryableSet(selectedVizSet),
                 VIZ_WIDTH,WINDOW_HEIGHT-100,argMap);
     }
 
-
-    //todo: add clearer selections states to these button
+    //todo: add clearer selections states to these buttons (also applx in selectedVizPlugin
     /**
      * Defines button to apply processing to a dataset
      * @param dataSet to apply transform to
@@ -205,6 +225,48 @@ public class ControlPanel extends JPanel{
 
         display(dialog,optionPanel,frame);
     }
+
+    /**
+     * Sets the current dataSet to visualise. Perhaps use multiple?
+     * @param ds
+     */
+    public void setSelectedVizSet(DataSet ds){
+        this.selectedVizSet = ds;
+    }
+
+    /**
+     * Popup dialog to set controlPanel's visualization plugin from the available options
+     */
+    public void getSelectedVizPlugin(){
+        final JDialog dialog = new JDialog(frame, "Select a Visualisation Plugin", true);
+        selectedVizPlugin = null; //reset
+
+        JPanel optionPanel = new JPanel(new GridLayout(0,1));
+        optionPanel.add(new JLabel("  Select a Visual Plugin from the loaded list.  "));
+
+        for (String pluginName : vizPluginList){
+            JButton button = new JButton(pluginName);
+            button.addActionListener(e -> {
+                this.selectedVizPlugin = pluginName;
+                System.out.println(this.selectedVizPlugin);});
+            optionPanel.add(button);
+        }
+
+        JButton closeButton = new JButton("VISUALIZE");
+        closeButton.addActionListener(e -> {
+            if(selectedVizPlugin != null) {
+                dialog.setVisible(false);
+                addStartScreen();
+            }
+            else{
+                JOptionPane.showMessageDialog(dialog, "Please select a visual plugin.");
+            }
+        });
+        optionPanel.add(closeButton);
+
+        display(dialog,optionPanel,frame);
+    }
+
 
     /**
      * Global dialog popup function

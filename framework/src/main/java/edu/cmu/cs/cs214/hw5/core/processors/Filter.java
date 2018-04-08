@@ -67,7 +67,7 @@ public class Filter implements Processor {
             }
         }
 
-        return new GeoDataSet(newList,incrementNumber(set.getName()));
+        return new GeoDataSet(newList,"f" + incrementNumber(set.getName()));
     }
 
     private static String incrementNumber(String s){
