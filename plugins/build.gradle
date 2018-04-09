@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     compile name: 'super-csv-2.4.0'
+    compile name: 'xchart-3.5.1'
     compile project(':framework')
     testCompile 'junit:junit:4.12'
 }
