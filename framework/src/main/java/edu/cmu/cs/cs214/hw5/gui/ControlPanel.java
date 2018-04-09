@@ -1,13 +1,9 @@
 package edu.cmu.cs.cs214.hw5.gui;
 
-import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-
 import edu.cmu.cs.cs214.hw5.core.*;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -152,7 +148,7 @@ public class ControlPanel extends JPanel{
             panel.setPreferredSize(new Dimension(VIZ_WIDTH, WINDOW_HEIGHT));
         }
         else{  //okok Let's draw it!
-            VisualPlugin plugin = PluginLoader.getVizPlugin(vizPluginList.get(0));
+            VisualPlugin plugin = PluginLoader.getVizPlugin(this.selectedVizPlugin);
 
             Map<String,Double> argMap = new HashMap<>();
 
