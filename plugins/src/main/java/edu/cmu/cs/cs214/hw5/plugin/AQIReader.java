@@ -6,7 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.cmu.cs.cs214.hw5.core.ClientPoint;
 import edu.cmu.cs.cs214.hw5.core.DataPlugin;
+import edu.cmu.cs.cs214.hw5.core.processors.ExpressionParser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -36,63 +38,56 @@ public class AQIReader implements DataPlugin{
     /**
      * @param argumentMap map from field parameters to client-provided arguments
      * @return collection of Points ready to be parsed into a DataSet
-     * @throws Exception if there was an I/O or parsing error (FileNotFound, I/O Exception, ParseException)
+     * @throws IOException if there was an I/O or parsing error (FileNotFound, I/O Exception, ParseException)
      */
     @Override
-    public Collection<ClientPoint> getCollection(Map<String, String> argumentMap) throws Exception {
+    public Collection<ClientPoint> getCollection(Map<String, String> argumentMap) throws IOException {
         List<ClientPoint> pointList = new ArrayList<>();
 
         String requestURL = "https://api.waqi.info/search/?token=" + TOKEN + "&keyword=" + argumentMap.get("City");
         URL url = new URL(requestURL);
         InputStream is = url.openStream();
-        try {
-              /* Now read the retrieved document from the stream. */
-            HttpURLConnection request = (HttpURLConnection) url.openConnection();
-            request.connect();
 
-            // Convert to a JSON object to print data
-            JsonParser jp = new JsonParser(); //from gson
-            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
-            JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
+          /* Now read the retrieved document from the stream. */
+        HttpURLConnection request = (HttpURLConnection) url.openConnection();
+        request.connect();
 
-            // Getting First Two Parts
-            String status = rootobj.get("status").getAsString();
-            for(JsonElement elem : rootobj.getAsJsonArray("data")){
+        // Convert to a JSON object to print data
+        JsonParser jp = new JsonParser(); //from gson
+        JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+        JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
 
-                JsonObject data = (JsonObject) elem;
-                System.out.println(data);
-                if(!data.get("aqi").getAsString().equals("")) {
-                    // Getting AQI
-                    Double aqi = data.get("aqi").getAsDouble();
+        // Getting First Two Parts
+        for(JsonElement elem : rootobj.getAsJsonArray("data")){
 
-                    /** TODO: The Name could be a very preciuos piece of information; Try to utilize this later
-                     *  TODO: Currently, we have <Name, AQI value in double>
-                     */
-                    // Getting Station
-                    JsonObject station = data.getAsJsonObject("station");
-                    String name = station.get("name").getAsString();
+            JsonObject data = (JsonObject) elem;
+            //System.out.println(data);
+            if(!data.get("aqi").getAsString().equals("")) {
+                // Getting AQI
+                Double aqi = data.get("aqi").getAsDouble();
 
-                    // Getting Coordinates
-                    JsonArray coordinates = station.getAsJsonArray("geo");
-                    Double latitude = coordinates.get(0).getAsDouble();
-                    Double longitude = coordinates.get(1).getAsDouble();
+                // Getting Station
+                JsonObject station = data.getAsJsonObject("station");
+                String name = station.get("name").getAsString();
 
-                    // Getting Time
-                    JsonObject time = data.getAsJsonObject("time");
-                    Double vtime = time.get("vtime").getAsDouble();
+                // Getting Coordinates
+                JsonArray coordinates = station.getAsJsonArray("geo");
+                Double latitude = coordinates.get(0).getAsDouble();
+                Double longitude = coordinates.get(1).getAsDouble();
 
-                    // TODO: This could be changed back to <"AQI", double value> if it doesn't work
-                    // Fomring Attribute Mapping
-                    Map<String, Double> attrMap = new HashMap<>();
-                    attrMap.put(name, aqi);
+                // Getting Time
+                JsonObject time = data.getAsJsonObject("time");
+                Double vtime = time.get("vtime").getAsDouble();
 
-                    ClientPoint newpoint = new ClientPoint(longitude, latitude, vtime, attrMap);
-                    pointList.add(newpoint);
-                }
+                // Forming Attribute Mapping
+                Map<String, Double> attrMap = new HashMap<>();
+                attrMap.put("AQI", aqi);
+
+                pointList.add(new ClientPoint(longitude, latitude, vtime, attrMap, name));
             }
-        } finally {
-            is.close();
         }
+
+        is.close();
 
         return pointList;
     }

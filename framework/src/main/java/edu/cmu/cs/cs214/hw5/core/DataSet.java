@@ -35,7 +35,7 @@ public abstract class DataSet {
      * @param t the t, or time, coordinate of the data
      * @param attributes a map of various attributes, with the name mapped to the value
      */
-    public abstract void makePoint(double x, double y, double t, Map<String, Double> attributes);
+    public abstract void makePoint(double x, double y, double t, Map<String, Double> attributes, String label);
 
     /**
      * @param attribute the string attribute
