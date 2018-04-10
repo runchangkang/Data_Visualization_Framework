@@ -1,14 +1,14 @@
 package edu.cmu.cs.cs214.hw5.core;
 
 import edu.wlu.cs.levy.CG.KDTree;
-import edu.wlu.cs.levy.CG.KeyDuplicateException;
-import edu.wlu.cs.levy.CG.KeySizeException;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
 /**
- * AttributeGroup class that holds all datapoints with the
- * given specific attribute type.
+ * AttributeGroup class that holds all DataPoints with a given specific attribute type. This
+ * provides a specialised data structure upon construction that enables querying.
+ *
  */
 class AttributeGroup {
     private final String type;
@@ -23,8 +23,10 @@ class AttributeGroup {
     }
 
     /**
+     * Inserts a dataPoint and attempts to place it in the group's KD-Tree.
+     *
      * @param point to add
-     * @exception IllegalArgumentException in case the point is not compatible with the attrgroup
+     * @exception IllegalArgumentException in case the point is not compatible with the AttributeGroup
      */
     void addDataPoint(DataPoint point){
         if(checkCompatibility(point)){
@@ -32,8 +34,9 @@ class AttributeGroup {
             try{
                 this.kdTree.insert(new double[]{point.getX(),point.getY(),point.getT()},point);
             }
-            catch (KeySizeException e1){}
-            catch (KeyDuplicateException e2){};
+            catch (Exception e1){
+                e1.printStackTrace();
+            }
         }
         else{
             throw new IllegalArgumentException("Point not compatible with AttrGroup type");
@@ -41,14 +44,14 @@ class AttributeGroup {
     }
 
     /**
-     * kdTree Getter function
-     * @return
+     * @return the complete KD-Tree of this AttributeGroup
      */
-    public KDTree getKdTree(){return this.kdTree;}
+    KDTree<DataPoint> getKdTree(){return this.kdTree;}
+
     /**
-     * Adds multiple, already-instantiated DataPoints into an attribute group
+     * Adds multiple, already-instantiated DataPoints into an attribute group and internal data structure
      * @param points collection of points to be added to the attribute group
-     * @exception IllegalArgumentException in case the point is not compatible with the attrgroup
+     * @exception IllegalArgumentException in case the point is not compatible with the AttributeGroup
      */
     void addDataPoints(Collection<DataPoint> points){
         for(DataPoint point : points){
@@ -58,15 +61,15 @@ class AttributeGroup {
             try{
                 this.kdTree.insert(new double[]{point.getX(),point.getY(),point.getT()},point);
             }
-            catch (KeySizeException e1){}
-            catch (KeyDuplicateException e2){};
+            catch (Exception e1){
+                e1.printStackTrace();
+            }
         }
         dataPoints.addAll(points);
-
     }
 
     /**
-     *
+     * Wrapper function for compatibility checking
      * @param point takes in a datapoint
      * @return boolean value indicating whether the input point is compatible
      */
