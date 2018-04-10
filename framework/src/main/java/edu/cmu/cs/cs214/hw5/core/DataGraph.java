@@ -34,7 +34,7 @@ public class DataGraph {
         counter++;
 
         for (ClientPoint cp : initialSet){
-            gs.makePoint(cp.getX(),cp.getY(),cp.getT(),cp.getAttr());
+            gs.makePoint(cp.getX(),cp.getY(),cp.getT(),cp.getAttr(),cp.getLabel());
         }
         dataSets.add(gs);
     }

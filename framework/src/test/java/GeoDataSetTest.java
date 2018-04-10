@@ -46,7 +46,7 @@ public class GeoDataSetTest {
         Map<String, Double> geomap = new HashMap<>();
         geomap.put("Weather", 4.001);
         geomap.put("AQI", 5.001);
-        geo.makePoint(1.001, 2.001, 3.001, geomap);
+        geo.makePoint(1.001, 2.001, 3.001, geomap,"");
         Set<String> geoset = new HashSet<>();
         geoset.add("Weather");
         geoset.add("AQI");

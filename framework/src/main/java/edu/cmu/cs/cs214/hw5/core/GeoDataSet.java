@@ -23,8 +23,9 @@ public class GeoDataSet extends DataSet{
      * @param attributes a map of various attributes, with the name mapped to the value
      */
     @Override
-    public void makePoint(double x, double y, double t, Map<String, Double> attributes) {
+    public void makePoint(double x, double y, double t, Map<String, Double> attributes, String label) {
         DataPoint newPoint = new DataPoint(x,y,t,attributes);
+        newPoint.addLabel(label);
         this.attributes.addAll(attributes.keySet());
         this.pointSet.add(newPoint);
     }
