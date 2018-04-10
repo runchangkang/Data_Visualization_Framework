@@ -25,9 +25,10 @@ public class GraphController {
     private static final int MIN_X_COLS = 5;
     private static final int MIN_Y_ROWS = 5;
     private static final int START_COLUMN = 1;
+    private static final int ARC = 15;
     private ControlPanel cp;
     private Map<DataSet, Location> dataMap = new HashMap<>();
-    private GridBagConstraints constraints= new GridBagConstraints();
+    private GridBagConstraints constraints = new GridBagConstraints();
 
     private JComponent[] components;
     private int counter;
@@ -44,21 +45,20 @@ public class GraphController {
         constraints.weighty = 1.0;
     }
 
-
     /**
-     * Stolen straight out of my Carcassonne GUI
-     * @param graphPanel
-     * @param x
-     * @param y
-     * @param dataset
+     * GridBagLayout insertion wrapper
+     * @param graphPanel container to add to
+     * @param x grid position to add in (NOT pixel)
+     * @param y grid position to add in (NOT pixel)
+     * @param setButton button being added
      */
-    private void addToGraph(JPanel graphPanel, int x, int y, JPanel dataset){
+    private void addToGraph(JPanel graphPanel, int x, int y, JPanel setButton){
         constraints.gridx = x;
         constraints.gridy = y;
-        graphPanel.add(dataset, constraints);
+        graphPanel.add(setButton, constraints);
     }
 
-    //
+
     private int getNextStartPos(){
         int y = -1;
 
@@ -67,13 +67,17 @@ public class GraphController {
                 y = Math.max(y,dataMap.get(set).getY());
             }
         }
-
         return y + 2;
     }
 
+    /**
+     * Adds one row of vertical space into the gridMap at any given y Coordinate
+     * @param y index to insert row at
+     */
     private void shiftMapDown(int y){
         Map<DataSet,Location> shiftedMap = new HashMap<>();
 
+        //compute shift
         for (DataSet set : dataMap.keySet()){
             if (dataMap.get(set).getY() >= y) {
                 Location l = dataMap.get(set);
@@ -81,15 +85,14 @@ public class GraphController {
             }
         }
 
-        for (DataSet set : shiftedMap.keySet()){
-            dataMap.remove(set);
-        }
+        //out with the old
+        for (DataSet set : shiftedMap.keySet()){ dataMap.remove(set); }
 
-        for (DataSet set : shiftedMap.keySet()){
-            dataMap.put(set,shiftedMap.get(set));
-        }
+        //in with the new
+        for (DataSet set : shiftedMap.keySet()){ dataMap.put(set,shiftedMap.get(set)); }
     }
 
+    //todo: add double-maxX counter to determine further join offset
     private void updateLocations(DataGraph graph){
         for (DataSet set : graph.getDataSets()){
             if (!dataMap.keySet().contains(set)) {
@@ -119,6 +122,9 @@ public class GraphController {
         }
     }
 
+    /**
+     * @return location representing the largest index present in the dataMap
+     */
     private Location getMaxMap(){
         int x = 0;
         int y = 0;
@@ -131,8 +137,15 @@ public class GraphController {
         return new Location(x + 1,y + 1);
     }
 
+    /**
+     * Makes a new DataSet button in the graph.
+     * @param set to enbuttonate
+     * @param x sizing
+     * @param y sizing
+     * @return JPanel with button representation
+     */
     private JPanel setButton(DataSet set, int x, int y){
-        JPanel relPanel = new JPanel(new GridLayout(0,1));
+        JPanel relPanel = new RoundedPanel(new GridLayout(0,1),Color.BLACK);
 
         JLabel name = new JLabel(set.getName());
         name.setHorizontalAlignment(JLabel.CENTER);
@@ -165,9 +178,9 @@ public class GraphController {
         relPanel.add(size);
         relPanel.add(fbutton);
         relPanel.add(vbutton);
-        relPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.BLACK,2,true),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+        //relPanel.setBorder(BorderFactory.createCompoundBorder(
+                //BorderFactory.createLineBorder(Color.BLACK,2,true),
+                //BorderFactory.createEmptyBorder(5,5,5,5)));
 
         relPanel.setMinimumSize(new Dimension(x,y));
 
@@ -193,10 +206,10 @@ public class GraphController {
 
         for (int i = 0; i <= yDim; i++){
             for (int j = 0; j <= xDim; j++){
-                if (!dataMap.values().contains(new Location(j,i))) {
+                if (!dataMap.values().contains(new Location(j,i)) && (i == 0 || j == 0 || i == yDim || j == xDim)){
                     JPanel panel = new JPanel();
                     panel.setMinimumSize(new Dimension(width/xDim,height/yDim));
-                    panel.add(new JLabel("(" + j + "," + i + ")"));
+                    //panel.add(new JLabel("(" + j + "," + i + ")"));
                     addToGraph(graphContainer,j,i,panel);
                 }
             }
@@ -214,84 +227,6 @@ public class GraphController {
     }
 
     /**
-     * Panel that draws the datagraph.
-     * //Todo: Use GridBagLayout and draw to the actual relationships
-     *
-     * @param graph to draw
-     * @param height allowed of graph
-     * @param width allowed of graph
-     * @return drawn panel w/ buttons & listeners
-     */
-    /*JPanel drawGraph(DataGraph graph, int height, int width){
-        JPanel containerPanel = new JPanel(new BorderLayout());
-        GridLayout padLayout = new GridLayout(0,1);
-        padLayout.setVgap(20);
-        GraphPanel gPanel = new GraphPanel(padLayout);
-
-        int pHeight = Math.min(50,height / ((graph.getRelations().size() * 2 )+ 1));
-
-        JComponent[] compSet = new JComponent[graph.getDataSets().size()];
-
-        int j = 0;
-        for (DataSet set : graph.getDataSets()) {
-            JPanel relPanel = new JPanel(new GridLayout(0,1));
-
-            JLabel name = new JLabel(set.getName());
-            name.setHorizontalAlignment(JLabel.CENTER);
-            name.setHorizontalTextPosition(JLabel.CENTER);
-
-            //add main label
-            JPanel sWrap = new JPanel();
-            JLabel size = new JLabel(set.size() + " elements");
-            size.setHorizontalAlignment(JLabel.CENTER);
-            size.setHorizontalTextPosition(JLabel.CENTER);
-            Font pf = size.getFont();
-            size.setFont(new Font(pf.getFamily(),pf.getStyle(),12));
-            sWrap.add(size);
-            sWrap.setBorder(BorderFactory.createEmptyBorder(12,12,12,12));
-            sWrap.setPreferredSize(new Dimension(width,pHeight/2));
-
-            //filter/transform button
-            JButton fbutton = new JButton("applyProcessing");
-            fbutton.setSize(new Dimension(width,pHeight/4));
-            fbutton.addActionListener( e -> cp.transDialog(set));
-
-            //visualisation button
-            JButton vbutton = new JButton("applyVisual");
-            vbutton.setSize(new Dimension(width,pHeight/4));
-            vbutton.addActionListener( e -> {
-                cp.setSelectedVizSet(set);
-                cp.getSelectedVizPlugin();
-                cp.vizWindow();
-            });
-
-            //graphics
-            relPanel.add(name);
-            relPanel.add(size);
-            relPanel.add(fbutton);
-            relPanel.add(vbutton);
-            relPanel.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(Color.BLACK,2,true),
-                        BorderFactory.createEmptyBorder(5,5,5,5)));
-
-            gPanel.add(relPanel);
-            compSet[j] = relPanel;
-            j++;
-        }
-        //gPanel.addCompSet(compSet); //gives the gPanel the graph components to draw //todo: add relationships
-
-        //extra buffer space
-        for (int i = 0; i < 4 - graph.getRelations().size(); i++){
-            JPanel bufPanel = new JPanel();
-            bufPanel.setSize(new Dimension(width, pHeight));
-            gPanel.add(bufPanel);
-        }
-        gPanel.setSize(new Dimension(width,height));
-        containerPanel.add(gPanel,BorderLayout.NORTH);
-        return gPanel;
-    }*/
-
-    /**
      * GraphPanel will draw lines btwn all of the components (inside it) that it is given
      * This should hypothetically work with GridBag too if there aren't overlaps
      */
@@ -301,11 +236,23 @@ public class GraphController {
         private JComponent[] components;
         private Map<DataSet,Integer> mapping;
 
+        /**
+         * New GraphPanel instance
+         * @param layout to pass to super
+         * @param graph to get relations to draw
+         */
         GraphPanel(GridBagLayout layout, DataGraph graph){
             super(layout);
             this.relations = graph.getRelations();
         }
 
+        /**
+         * Determine parent-child relationships defined in the graph and draw the relevant
+         * connections. Note that the components and mapping field MUST be set before
+         * this is actually called, or we'll get a NullPointerException.
+         *
+         * @param g graphics context
+         */
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -323,6 +270,11 @@ public class GraphController {
             }
         }
 
+        /**
+         * Return the center of a swing component
+         * @param c component to find
+         * @return center
+         */
         private Point2D.Double getCenter(Component c) {
             Point2D.Double p = new Point2D.Double();
             Rectangle r = c.getBounds();
@@ -331,32 +283,56 @@ public class GraphController {
             return p;
         }
 
+        /**
+         * @param components JComponents to draw relationships between
+         */
         private void setComponents(JComponent[] components){
             this.components = components;
         }
 
+        /**
+         * @param mapping of DataSets to their index in the JComponent array
+         */
         private void setMapping(Map<DataSet,Integer> mapping){
             this.mapping = mapping;
         }
     }
 
+    /**
+     * Wrapper class used to denote locations in the graph map and as a general-purpose tuple. Immutable.
+     */
     private class Location{
         private final int x;
         private final int y;
 
+        /**
+         * @param x position
+         * @param y position
+         */
         Location(int x, int y){
             this.x = x;
             this.y = y;
         }
 
+        /**
+         * @return x position
+         */
         int getX() {
             return x;
         }
 
+        /**
+         * @return y position
+         */
         int getY() {
             return y;
         }
 
+        /**
+         * Equality is determined by X and Y components
+         * @param obj to test for equality
+         * @return isEqual (value)
+         */
         @Override
         public boolean equals(Object obj) {
             if (!(obj instanceof Location)){
@@ -368,9 +344,41 @@ public class GraphController {
             }
         }
 
+        /**
+         * @return hashCode dependent on values
+         */
         @Override
         public int hashCode() {
             return ((31*x)+17)*y;
+        }
+    }
+
+
+    private class RoundedPanel extends JPanel{
+
+        private Color borderColor;
+
+        RoundedPanel(GridLayout layout,Color borderColor){
+            super(layout);
+            this.borderColor = borderColor;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Dimension arcs = new Dimension(ARC,ARC); //Border corners arcs {width,height}, change this to whatever you want
+            int width = getWidth();
+            int height = getHeight();
+            Graphics2D graphics = (Graphics2D) g;
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+
+            //Draws the rounded panel with borders.
+            graphics.setColor(getBackground());
+            graphics.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);//paint background
+            graphics.setColor(borderColor);
+            graphics.setStroke(new BasicStroke(1.0f));
+            graphics.drawRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);//paint border
         }
     }
 

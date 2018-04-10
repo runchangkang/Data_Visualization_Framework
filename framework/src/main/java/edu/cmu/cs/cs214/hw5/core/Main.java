@@ -36,7 +36,7 @@ public class Main {
         argMap.put(ATTRIBUTE_LABEL,"Wind,Light");
         try {
             Collection<ClientPoint> cx = CSV.getCollection(argMap);
-            dg.addClientSet(cx);
+            dg.addClientSet(cx,"testset");
             new FrameworkGUI(dg);
         }
         catch (Exception e){

@@ -29,8 +29,8 @@ public class DataGraph {
         return new ArrayList<>(dataSets);
     }
 
-    public void addClientSet(Collection<ClientPoint> initialSet){
-        DataSet gs = new GeoDataSet(new ArrayList<>(),"dataset" + counter);
+    public void addClientSet(Collection<ClientPoint> initialSet, String name){
+        DataSet gs = new GeoDataSet(new ArrayList<>(),name);
         counter++;
 
         for (ClientPoint cp : initialSet){
