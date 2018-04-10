@@ -69,6 +69,6 @@ public class QueryableSetTest {
 
     @Test
     public void testKDTree(){
-        assertEquals((double)7,this.queryableSet.querySet(3,2,3,"Weather"),1e-9);
+        assertEquals((double)5.543,this.queryableSet.querySet(3,2,3,"Weather"),1e-2);
     }
 }

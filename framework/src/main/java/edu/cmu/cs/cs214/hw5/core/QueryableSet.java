@@ -52,11 +52,18 @@ public class QueryableSet {
         }
 
         double sum = 0;
-        for(DataPoint dataPoint : dataPoints){
-            sum += dataPoint.getAttribute(attribute);
+        for(DataPoint point : dataPoints){
+            sum += point.getAttribute(attribute);
         }
-
-        return sum/(double)NEAREST_POINTS_AMOUNT;
+        if(sum == 0) return 0;
+        else{
+            double total = 0;
+            for (DataPoint point : dataPoints){
+                double attr = point.getAttribute(attribute);
+                total += attr * (1.0 - (attr/sum));
+            }
+            return total/NEAREST_POINTS_AMOUNT;
+        }
     }
 
     /**
