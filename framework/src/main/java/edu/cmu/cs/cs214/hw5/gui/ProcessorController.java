@@ -118,12 +118,11 @@ public class ProcessorController {
         Map<String,String> argMap = new HashMap<>();
         List<String> defaultSet = new ArrayList<>(Arrays.asList(DataPoint.X_ATTRIB,DataPoint.Y_ATTRIB,DataPoint.T_ATTRIB));
         defaultSet.addAll(dataSet.getAttributes());
-        ControlPanel.paramFieldSet(defaultSet,argMap,optionPanel);
+        ControlPanel.paramFieldSet(defaultSet,argMap,optionPanel,dataSet);
 
         JButton closeButton = new JButton("APPLY");
 
         //todo: move the graph application logic entirely into datagraph class
-        //todo: make filters operate on xyt args as well as normal attr. args
         closeButton.addActionListener(e -> {
             try {
                 Filter f = new Filter(argMap);
@@ -154,7 +153,7 @@ public class ProcessorController {
         final JDialog dialog = new JDialog(frame, "Define Transform Expressions", true);
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
         Map<String,String> argMap = new HashMap<>();
-        ControlPanel.paramFieldSet(dataSet.getAttributes(),argMap,optionPanel);
+        ControlPanel.paramFieldSet(dataSet.getAttributes(),argMap,optionPanel,null);
 
         JButton closeButton = new JButton("APPLY");
 

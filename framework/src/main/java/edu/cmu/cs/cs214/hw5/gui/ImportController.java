@@ -7,10 +7,8 @@ import edu.cmu.cs.cs214.hw5.core.PluginLoader;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controls importing DataSets with Data Plugins
@@ -20,6 +18,8 @@ public class ImportController {
     private String selectedDataPlugin;
     private DataGraph graph;
     private ControlPanel cp;
+
+    private static final String NAME = "Name";
 
     /**
      * Defines a new import controller
@@ -73,17 +73,15 @@ public class ImportController {
      */
     private void dataPluginDialog(String selectedDataPlugin, JFrame frame){
         DataPlugin dp = PluginLoader.getDataPlugin(selectedDataPlugin);
-        List<String> options = dp.getPopupParameters();
+        List<String> options = new ArrayList<>(Collections.singletonList(NAME));
+        options.addAll(dp.getPopupParameters());
         final JDialog dialog = new JDialog(frame, "Select a DataSet Plugin", true);
 
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
 
-        //todo: have argmap add in a name option for the client to name their dataset
-        //todo: prevent viz full redraw by not calling addstartscreen just graphArea container redraw
-        //      -- alternatively hotfix by save params
         Map<String,String> argMap = new HashMap<>();
 
-        ControlPanel.paramFieldSet(options,argMap,optionPanel);
+        ControlPanel.paramFieldSet(options,argMap,optionPanel,null);
 
         JPanel wrapper = new JPanel();
         JButton closeButton = new JButton("CREATE");
@@ -91,7 +89,8 @@ public class ImportController {
             if(verifyMap(argMap,options)){
                 try {
                     Collection<ClientPoint> dSet = dp.getCollection(argMap);
-                    graph.addClientSet(dSet);
+                    System.out.println(argMap.get("N"));
+                    graph.addClientSet(dSet,argMap.get(NAME));
                     dialog.setVisible(false);
                     cp.addStartScreen();
                 }

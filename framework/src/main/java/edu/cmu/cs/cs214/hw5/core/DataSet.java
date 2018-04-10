@@ -51,6 +51,30 @@ public abstract class DataSet {
         return newGroup;
     }
 
+    public double getMin(String attribute){
+        double x = Double.MAX_VALUE;
+
+        for (DataPoint pt : pointSet) {
+            if (pt.hasAttr(attribute)) {
+                x = Math.min(pt.getAttribute(attribute),x);
+            }
+        }
+
+        return x;
+    }
+
+    public double getMax(String attribute){
+        double x = -Double.MAX_VALUE;
+
+        for (DataPoint pt : pointSet) {
+            if (pt.hasAttr(attribute)) {
+                x = Math.max(pt.getAttribute(attribute),x);
+            }
+        }
+
+        return x;
+    }
+
     /**
      * @return all of the attributes this set currently contains
      */
