@@ -21,6 +21,7 @@ public class DataPoint {
     private double t;
     private String[] attrNames;
     private double[] attr;
+    private String label = "";
 
     /**
      * Takes x, y, t, and attr value to initialize the data point
@@ -43,6 +44,18 @@ public class DataPoint {
             attr[i] = attributes.get(key);
             i++;
         }
+    }
+
+    public void addLabel(String s){
+        this.label = s;
+    }
+
+    public String getLabel(){
+        return this.label;
+    }
+
+    public boolean hasLabel(){
+        return !"".equals(this.label.replaceAll("\\s",""));
     }
 
     /**
@@ -123,10 +136,16 @@ public class DataPoint {
      */
     @Override
     public String toString() {
-        String s = "X: " + new DecimalFormat("####.##").format(x) + "\t" +
+        String s;
+        if (this.hasLabel()){
+            s = this.label + " : ";
+        }
+        else{ s = ""; }
+        String start = s + "X: " + new DecimalFormat("####.##").format(x) + "\t" +
                    "Y: " + new DecimalFormat("####.##").format(y) + "\t" +
                    "T: " + new DecimalFormat("####.##").format(t) + "\t";
-        StringBuilder bldr = new StringBuilder(s);
+        StringBuilder bldr = new StringBuilder(start);
+
         bldr.append(" [ ");
         for (int i = 0; i < attrNames.length; i++){
             bldr.append(attrNames[i]);

@@ -89,7 +89,7 @@ public class CSVReader implements DataPlugin {
                 for (String attribute : attrCols){
                     attributeMap.put(attribute,Double.parseDouble((String) values.get(attribute)));
                 }
-                ClientPoint p = new ClientPoint(x,y,z,attributeMap);
+                ClientPoint p = new ClientPoint(x,y,z,attributeMap,"");
                 //System.out.println(p);
                 pointList.add(p);
             }
