@@ -67,7 +67,7 @@ public class AQIReader implements DataPlugin{
         for(JsonElement elem : rootobj.getAsJsonArray("data")){
 
             JsonObject data = (JsonObject) elem;
-            System.out.println(elem);
+            //System.out.println(elem);
             if(data.get("aqi").getAsString().matches(".*\\d+.*")) {
                 // Getting AQI
                 Double aqi = data.get("aqi").getAsDouble();

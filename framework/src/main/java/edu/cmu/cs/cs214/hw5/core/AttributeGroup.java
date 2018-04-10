@@ -35,7 +35,7 @@ class AttributeGroup {
                 this.kdTree.insert(new double[]{point.getX(),point.getY(),point.getT()},point);
             }
             catch (Exception e1){
-                e1.printStackTrace();
+                //e1.printStackTrace();
             }
         }
         else{
