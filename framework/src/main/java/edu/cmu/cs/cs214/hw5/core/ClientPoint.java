@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Library Point class set up for the Data Plugin interface to call - accessible to client.
- * This is primarily provided for convenience and encapsulation, so that the client is separated
- * from the internals of the DataSet class.
+ * Point class set up for the Data Source Plugin. Provides a constructor for clients implementing source plugins.
  */
 public class ClientPoint {
 
@@ -17,11 +15,12 @@ public class ClientPoint {
     private String label;
 
     /**
-     * Creates a new point
+     * Creates a new point.
      * @param x val
      * @param y val
      * @param t val
      * @param attributes mapped strings to attribute values
+     * @param label additional label to mark point with
      */
     public ClientPoint(double x, double y, double t, Map<String,Double> attributes, String label){
         this.x = x;
@@ -34,33 +33,33 @@ public class ClientPoint {
     /**
      * @return x
      */
-    public double getX() {
+    double getX() {
         return x;
     }
 
     /**
      * @return y
      */
-    public double getY() {
+    double getY() {
         return y;
     }
 
     /**
      * @return t
      */
-    public double getT() {
+    double getT() {
         return t;
     }
 
     /**
      * @return attribute values
      */
-    public Map<String, Double> getAttr() {
+    Map<String, Double> getAttr() {
         return new HashMap<>(attributes);
     }
 
 
-    public String getLabel(){
+    String getLabel(){
         return this.label;
     }
 

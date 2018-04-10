@@ -6,12 +6,12 @@ import java.util.Map;
 /**
  * Implementation of DataSet Abstract Class
  */
-public class GeoDataSet extends DataSet{
+class GeoDataSet extends DataSet{
 
     /**
      * @param newSet new mapping to instantiate. possibly empty.
      */
-    public GeoDataSet (List<DataPoint> newSet, String name){
+    GeoDataSet (List<DataPoint> newSet, String name){
         super(name,newSet);
     }
     /**
@@ -23,7 +23,7 @@ public class GeoDataSet extends DataSet{
      * @param attributes a map of various attributes, with the name mapped to the value
      */
     @Override
-    public void makePoint(double x, double y, double t, Map<String, Double> attributes, String label) {
+    void makePoint(double x, double y, double t, Map<String, Double> attributes, String label) {
         DataPoint newPoint = new DataPoint(x,y,t,attributes);
         newPoint.addLabel(label);
         this.attributes.addAll(attributes.keySet());

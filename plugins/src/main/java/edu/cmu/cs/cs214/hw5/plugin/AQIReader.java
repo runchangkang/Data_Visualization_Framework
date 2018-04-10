@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.cmu.cs.cs214.hw5.core.ClientPoint;
 import edu.cmu.cs.cs214.hw5.core.DataPlugin;
-import edu.cmu.cs.cs214.hw5.core.processors.ExpressionParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,8 +42,10 @@ public class AQIReader implements DataPlugin{
     @Override
     public Collection<ClientPoint> getCollection(Map<String, String> argumentMap) throws IOException {
         List<ClientPoint> pointList = new ArrayList<>();
+        String city = argumentMap.get("City");
+        city = city.replace(" ", "");
 
-        String requestURL = "https://api.waqi.info/search/?token=" + TOKEN + "&keyword=" + argumentMap.get("City");
+        String requestURL = "https://api.waqi.info/search/?token=" + TOKEN + "&keyword=" + city;
         URL url = new URL(requestURL);
         InputStream is = url.openStream();
 
@@ -61,8 +62,8 @@ public class AQIReader implements DataPlugin{
         for(JsonElement elem : rootobj.getAsJsonArray("data")){
 
             JsonObject data = (JsonObject) elem;
-            //System.out.println(data);
-            if(!data.get("aqi").getAsString().equals("")) {
+            System.out.println(elem);
+            if(data.get("aqi").getAsString().matches(".*\\d+.*")) {
                 // Getting AQI
                 Double aqi = data.get("aqi").getAsDouble();
 

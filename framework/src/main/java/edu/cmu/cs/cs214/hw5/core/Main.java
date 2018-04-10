@@ -1,7 +1,5 @@
 package edu.cmu.cs.cs214.hw5.core;
 
-import edu.cmu.cs.cs214.hw5.gui.FrameworkGUI;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +34,7 @@ public class Main {
         argMap.put(ATTRIBUTE_LABEL,"Wind,Light");
         try {
             Collection<ClientPoint> cx = CSV.getCollection(argMap);
-            dg.addClientSet(cx);
+            dg.addClientSet(cx,"testset");
             new FrameworkGUI(dg);
         }
         catch (Exception e){

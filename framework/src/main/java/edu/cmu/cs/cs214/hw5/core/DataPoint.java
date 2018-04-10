@@ -30,7 +30,7 @@ public class DataPoint {
      * @param t the time value of the data point
      * @param attributes keyMap
      */
-    public DataPoint(double x, double y, double t, Map<String,Double> attributes){
+    DataPoint(double x, double y, double t, Map<String,Double> attributes){
         this.x = x;
         this.y = y;
         this.t = t;
@@ -46,43 +46,74 @@ public class DataPoint {
         }
     }
 
-    public void addLabel(String s){
-        this.label = s;
-    }
-
-    public String getLabel(){
-        return this.label;
-    }
-
-    public boolean hasLabel(){
-        return !"".equals(this.label.replaceAll("\\s",""));
-    }
-
     /**
-     * @return x
+     * @return x coordinate
      */
     public double getX() {
         return x;
     }
 
     /**
-     * @return y
+     * @return y coordinate
      */
     public double getY() {
         return y;
     }
 
     /**
-     * @return t
+     * @return t value
      */
     public double getT() {
         return t;
     }
 
     /**
+     * @return whether point has a meaningful label associated with it
+     */
+    private boolean hasLabel(){
+        return !"".equals(this.label.replaceAll("\\s",""));
+    }
+
+    //Todo: implement visualisation plugin using this feature
+    /**
+     * @return the label associated with this point. Will return "" if there is none.
+     */
+    public String getLabel(){
+        return this.label;
+    }
+
+    /**
+     * Set a point's label.
+     * @param s label to set
+     */
+    void addLabel(String s){
+        this.label = s;
+    }
+
+    /**
+     * Does a point have a specific attribute?
      *
-     * @param name the name of the attribute in string format
+     * @param name of the attribute in string format
+     * @return whether the attribute exists in the point
+     */
+    public boolean hasAttr(String name){
+        if (name.equals(X_ATTRIB) || name.equals(Y_ATTRIB) || name.equals(T_ATTRIB)){
+            return true;
+        }
+        for (String attribute : attrNames){
+            if (attribute.equals(name)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the value of a certain attribute at this geographical point.
+     *
+     * @param name attribute in string format
      * @return the actual attribute value
+     * @throws IllegalArgumentException if the point does not have this attribute. Use the hasAttr() method to check!
      */
     public double getAttribute(String name) {
         if(name.equals(X_ATTRIB)){
@@ -106,33 +137,16 @@ public class DataPoint {
     }
 
     /**
+     * Get all of the attributes that this point has.
      *
-     * @param name the name of the attribute in string format
-     * @return whether the attribute exists in the point
-     */
-    public boolean hasAttr(String name){
-        if (name.equals(X_ATTRIB) || name.equals(Y_ATTRIB) || name.equals(T_ATTRIB)){
-            return true;
-        }
-        for (String attribute : attrNames){
-            if (attribute.equals(name)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     *
-     * @return all the attributes in the datapoint instance as a list of strings
+     * @return attributes as strings
      */
     public List<String> getAttributes(){
         return new ArrayList<>(Arrays.asList(attrNames));
     }
 
     /**
-     *
-     * @return The string representation of the datapoint as a useful tool for debugging
+     * @return The string representation of the DataPoint
      */
     @Override
     public String toString() {
