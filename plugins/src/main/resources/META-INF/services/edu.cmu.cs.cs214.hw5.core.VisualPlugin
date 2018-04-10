@@ -1,2 +1,3 @@
 edu.cmu.cs.cs214.hw5.plugin.TestVisual
 edu.cmu.cs.cs214.hw5.plugin.ScatterPlugin
+edu.cmu.cs.cs214.hw5.plugin.HeatMapPlugin
