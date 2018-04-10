@@ -1,6 +1,5 @@
 package edu.cmu.cs.cs214.hw5.core;
 
-import edu.cmu.cs.cs214.hw5.core.DataPoint;
 import org.junit.Before;
 import org.junit.Test;
 

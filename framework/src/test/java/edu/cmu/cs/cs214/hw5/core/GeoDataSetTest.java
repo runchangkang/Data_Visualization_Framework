@@ -1,9 +1,5 @@
 package edu.cmu.cs.cs214.hw5.core;
 
-import edu.cmu.cs.cs214.hw5.core.AttributeGroup;
-import edu.cmu.cs.cs214.hw5.core.DataPoint;
-import edu.cmu.cs.cs214.hw5.core.DataSet;
-import edu.cmu.cs.cs214.hw5.core.GeoDataSet;
 import org.junit.Before;
 import org.junit.Test;
 

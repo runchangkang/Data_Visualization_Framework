@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Library class that implements custom data structures to enhance querying for data that is "nearby"
- * other Geo-Tagged data in the set.
+ * Library class for visualisation plugins that implements custom data structures to enhance querying for data
+ * that is "nearby" other Geo-Tagged data. This is meant for visualisation plugins to gain additional information
+ * about the source data and implement a flexible range of plug-ins.
  */
 public class QueryableSet {
 
@@ -17,13 +18,15 @@ public class QueryableSet {
     }
 
     /**
-     * Dummy method for interpolations.
-     * Todo: Set up K-D Tree for attributeGroup to enable fast NN query and interpolating
+     * Method to query the dataset for a point. Given a spatial (geo-tag) location and an attribute to look for,
+     * this method returns it's best guess (given the source data) at what the attribute value would be at this
+     * geographical point, regardless of the presence of this point in the actual set. This is useful when trying to
+     * generate a uniform map-like visualisation from a source set that contains only random or sparse data.
      *
-     * @param x coordinate to interpolate
-     * @param y coordinate to interpolate
-     * @param t coordinate to interpolate
-     * @param attribute to interpolate for
+     * @param x location coordinate to interpolate at
+     * @param y location coordinate to interpolate at
+     * @param t location coordinate to interpolate at
+     * @param attribute to get the value of
      * @return interpolated attribute value for this point.
      */
     public double querySet (int x, int y, int t, String attribute){
@@ -31,15 +34,22 @@ public class QueryableSet {
     }
 
     /**
-     * @return all attributes that the set currently contains
+     * Fetches all of the attributes currently contained within any of the points in the set. Not all points
+     * are guaranteed to have all attributes, but at least one point will have each attribute.
+     *
+     * @return set of attribute names
      */
     public Set<String> getAttributes(){
         return dataSet.getAttributes();
     }
 
     /**
+     * Fetches all of the Data Points that have a specific attribute from the set. This enables the visualisation
+     * to tailor to only the data that exists (which is necessary while implementing certain visualisations such
+     * as bar graphs and histograms). Each DataPoint contains an interface to extract point-specific information.
+     *
      * @param attribute to query for
-     * @return all DataPoints that contain a specific attribute
+     * @return all DataPoints that have that specific attribute
      */
     public List<DataPoint> getAttributeGroup(String attribute){
         return new ArrayList<>(dataSet.getAttributeGroup(attribute).getDataPoints());

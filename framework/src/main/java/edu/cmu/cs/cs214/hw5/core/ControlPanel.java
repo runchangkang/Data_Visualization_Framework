@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * GUI implementation to test layout and loading
  */
-public class ControlPanel extends JPanel{
+class ControlPanel extends JPanel{
 
     private JFrame frame;
     private DataGraph graph;
