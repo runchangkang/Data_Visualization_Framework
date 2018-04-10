@@ -1,13 +1,32 @@
 package edu.cmu.cs.cs214.hw5.gui;
 
-import edu.cmu.cs.cs214.hw5.core.*;
+import edu.cmu.cs.cs214.hw5.core.DataGraph;
+import edu.cmu.cs.cs214.hw5.core.DataSet;
+import edu.cmu.cs.cs214.hw5.core.Parameter;
+import edu.cmu.cs.cs214.hw5.core.PluginLoader;
+import edu.cmu.cs.cs214.hw5.core.QueryableSet;
+import edu.cmu.cs.cs214.hw5.core.VisualPlugin;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,6 +53,8 @@ public class ControlPanel extends JPanel{
     private static final int PLUGIN_WIDTH = 200;
     private static final int GRAPH_WIDTH = WINDOW_WIDTH - PLUGIN_WIDTH;
     private static final int VIZ_WIDTH = WINDOW_WIDTH - PLUGIN_WIDTH;
+    private static final int PANEL_WIDTH = 300;
+    private static final int PANEL_HEIGHT = 200;
 
     /**
      * Sets up frame and initialises the controllers. Imports any found plugins.
@@ -77,10 +98,11 @@ public class ControlPanel extends JPanel{
     }
 
     /**
-     * Plugin sidebar layout and setup. Displays loaded plugins from
+     * Plugin sidebar layout and setup. Displays loaded plugins of both types from files.
      * @return JPanel with plugin window
      */
     private JPanel pluginWindow(){
+        JPanel wrapper = new JPanel(new BorderLayout());
         JPanel panel = new JPanel(new GridLayout(0,1,0,50));
         JPanel dataPanel = new JPanel(new BorderLayout());
         JPanel vizPanel = new JPanel(new BorderLayout());
@@ -101,20 +123,22 @@ public class ControlPanel extends JPanel{
         vizPanel.setBorder(new CompoundBorder(new LineBorder(Color.BLACK,1),new EmptyBorder(10,10,0,0)));
         vizPanel.setPreferredSize(new Dimension(PLUGIN_WIDTH,WINDOW_HEIGHT/2));
 
-        JButton loadPluginButton = new JButton("Load Plugins");
+        JButton loadPluginButton = new JButton("AutoLoad Plugins");
         loadPluginButton.addActionListener(e -> {
             this.dataPluginList = PluginLoader.listDataPlugins();
             this.vizPluginList = PluginLoader.listVisualPlugins();
             addStartScreen();
         });
+        loadPluginButton.setPreferredSize(new Dimension(PLUGIN_WIDTH,50));
 
         panel.add(dataPanel);
         panel.add(vizPanel);
-        panel.add(loadPluginButton);
+        panel.setBorder(new EmptyBorder(0,0,20,0));
+        wrapper.add(panel,BorderLayout.CENTER);
+        wrapper.add(loadPluginButton,BorderLayout.SOUTH);
 
-        //panel.setPreferredSize(new Dimension(PLUGIN_WIDTH,WINDOW_HEIGHT));
-        panel.setBorder(new CompoundBorder(new MatteBorder(0,0,0,1,Color.BLACK),new EmptyBorder(10,20,10,20)));
-        return panel;
+        wrapper.setBorder(new CompoundBorder(new MatteBorder(0,0,0,1,Color.BLACK),new EmptyBorder(20,20,20,20)));
+        return wrapper;
     }
 
     /**
@@ -124,6 +148,7 @@ public class ControlPanel extends JPanel{
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(gc.drawGraphWide(graph,GRAPH_WIDTH,WINDOW_HEIGHT),BorderLayout.CENTER);
         panel.add(createButton(),BorderLayout.SOUTH);
+        panel.setBorder(new EmptyBorder(20,20,20,20));
         return panel;
     }
 
@@ -139,19 +164,16 @@ public class ControlPanel extends JPanel{
     }
 
     /**
-     * MAIN METHOD FOR VISUALISATION PLUGIN IMPLEMENTATION
-     * get this to work.
-     *
-     * //Todo: MOVE INTO VIZCONTROLLER CLASS
-     *
-     * @return JPanel with the visualisation interface
+     * MAIN METHOD FOR VISUALISATION PLUGIN IMPLEMENTATION -- CREATES A POPUP.
+     * This enables as many separate views as your computer can handle!
+     * //todo: vizcontroller?
      */
      void vizWindow(){
         JPanel panel = new JPanel(new BorderLayout());
 
         //Default case: a visualisation has not yet been initialised
         if (selectedVizSet == null || selectedVizPlugin == null) {
-            System.out.println("Something is null");
+            //System.out.println("Something is null");
             JButton params = new JButton("Parameters");
             params.setPreferredSize(new Dimension(VIZ_WIDTH, 100));
             panel.add(params, BorderLayout.NORTH);
@@ -178,11 +200,12 @@ public class ControlPanel extends JPanel{
              *     -> The container is reset and fully redrawn with new argMap on slider change
              */
 
-            JPanel params = new JPanel(new GridLayout(0,2));
+            JPanel params = new JPanel(new BorderLayout());
             for (Parameter p : plugin.addInterfaceParameters().getParameters()){
                 argMap.put(p.getName(), (p.getMin() + p.getMax()) / 2);
-                JLabel label = new JLabel(p.getName());
+                JLabel label = new JLabel(p.getName() + "    " + new DecimalFormat("####.##").format(p.getMin()));
                 JSlider slider = new JSlider((int) p.getMin(), (int) p.getMax());
+                JLabel max = new JLabel(new DecimalFormat("####.##").format(p.getMax()));
                 slider.addChangeListener( e ->{
                     container.removeAll();
                     argMap.put(p.getName(),(double) slider.getValue());
@@ -190,8 +213,9 @@ public class ControlPanel extends JPanel{
                     container.revalidate();
                     container.repaint();
                 });
-                params.add(label);
-                params.add(slider);
+                params.add(label,BorderLayout.WEST);
+                params.add(slider,BorderLayout.CENTER);
+                params.add(max,BorderLayout.EAST);
             }
             panel.add(params,BorderLayout.NORTH);
 
@@ -199,7 +223,8 @@ public class ControlPanel extends JPanel{
             JPanel drawnViz = drawViz(plugin,argMap);
             container.add(drawnViz);
             panel.add(container,BorderLayout.CENTER);
-            panel.setPreferredSize(new Dimension(VIZ_WIDTH,WINDOW_HEIGHT));
+            panel.setBorder(new EmptyBorder(20,50,20,50));
+            panel.setPreferredSize(new Dimension(VIZ_WIDTH + 100,WINDOW_HEIGHT));
 
             display(visualDisplay,panel,frame);
         }
@@ -216,13 +241,12 @@ public class ControlPanel extends JPanel{
                 VIZ_WIDTH,WINDOW_HEIGHT-100,argMap);
     }
 
-    //todo: add clearer selections states to these buttons (also applx in selectedVizPlugin
     /**
      * Defines button to apply processing to a dataset
      * @param dataSet to apply transform to
      */
     void transDialog(DataSet dataSet){
-        final JDialog dialog = new JDialog(frame, "Processing Data", true);
+        final JDialog dialog = new JDialog(frame, "Select Processing Operation", true);
 
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
 
@@ -237,6 +261,8 @@ public class ControlPanel extends JPanel{
         JButton jButton = new JButton("Join");
         jButton.addActionListener(e -> {dialog.setVisible(false);pc.joinDialog(dataSet,graph);});
         optionPanel.add(jButton);
+
+        optionPanel.setPreferredSize(new Dimension(PANEL_WIDTH,PANEL_HEIGHT));
 
         display(dialog,optionPanel,frame);
     }
@@ -263,7 +289,8 @@ public class ControlPanel extends JPanel{
             JButton button = new JButton(pluginName);
             button.addActionListener(e -> {
                 this.selectedVizPlugin = pluginName;
-                System.out.println(this.selectedVizPlugin);});
+                //System.out.println(this.selectedVizPlugin);
+            });
             optionPanel.add(button);
         }
 
@@ -278,6 +305,7 @@ public class ControlPanel extends JPanel{
             }
         });
         optionPanel.add(closeButton);
+        optionPanel.setPreferredSize(new Dimension(PANEL_WIDTH,PANEL_HEIGHT));
 
         display(dialog,optionPanel,frame);
     }
@@ -300,10 +328,9 @@ public class ControlPanel extends JPanel{
      * Define a text-field popup to get multiple text parameters from the user
      * @param args labels to get
      * @param argMap returned arguments
-     * @param container JPanel to be placed in
+     * @param set dataSet to query for mins/maxes if desired
      */
-    //todo: tweak to not be stupid (see container)
-    static void paramFieldSet(Collection<String> args, Map<String,String> argMap, JPanel container, DataSet set){
+    static JPanel paramFieldSet(Collection<String> args, Map<String,String> argMap, DataSet set){
         JPanel wrapper = new JPanel(new BorderLayout());
         JPanel labelPanel = new JPanel(new GridLayout(0,1));
         JPanel fieldPanel = new JPanel(new GridLayout(0,1));
@@ -337,6 +364,6 @@ public class ControlPanel extends JPanel{
         fieldPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         wrapper.add(labelPanel,BorderLayout.WEST);
         wrapper.add(fieldPanel,BorderLayout.CENTER);
-        container.add(wrapper);
+        return wrapper;
     }
 }

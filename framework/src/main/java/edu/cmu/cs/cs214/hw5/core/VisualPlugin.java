@@ -1,6 +1,6 @@
 package edu.cmu.cs.cs214.hw5.core;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 import java.util.Map;
 
 
@@ -21,7 +21,7 @@ public interface VisualPlugin {
     /**
      * @return a list of parameters that contain useful information regarding the data visualisation
      */
-    public ParameterList addInterfaceParameters();
+    ParameterList addInterfaceParameters();
 
     /**
      * Draw the JPanel. This gives the client flexibility to use whatever library they desire

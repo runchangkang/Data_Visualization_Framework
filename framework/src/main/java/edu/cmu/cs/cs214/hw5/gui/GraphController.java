@@ -9,7 +9,20 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import java.awt.*;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
@@ -17,22 +30,24 @@ import java.util.Map;
 import java.util.List;
 
 /**
- * Controller for drawing and performing datagraph manipulations
+ * Controller for drawing and performing DataGraph manipulations
  */
 public class GraphController {
 
-    private static final int PADDING = 10;
-    private static final int MIN_X_COLS = 5;
-    private static final int MIN_Y_ROWS = 5;
-    private static final int START_COLUMN = 1;
-    private static final int ARC = 15;
+    private static final int PADDING = 10;      //min graph padding
+    private static final int MIN_X_COLS = 5;    //graph start
+    private static final int MIN_Y_ROWS = 5;    //graph start
+    private static final int START_COLUMN = 1;  //graph start
+    private static final int ARC = 15;          //edge rounding
+
+
     private ControlPanel cp;
     private Map<DataSet, Location> dataMap = new HashMap<>();
     private GridBagConstraints constraints = new GridBagConstraints();
 
-    private JComponent[] components;
-    private int counter;
-    private Map<DataSet,Integer> componentIndex;
+    private JComponent[] components;            //index of drawn components                                (refreshed)
+    private int counter;                        //reference map to index of currently drawn component           (ref.)
+    private Map<DataSet,Integer> componentIndex;//index mapping data set to component[] index to track relation (ref.)
 
     /**
      * Instantiates a new graph controller
@@ -59,6 +74,10 @@ public class GraphController {
     }
 
 
+    /**
+     * Input a newly imported dataset into the graph.
+     * @return y position in the starting column to insert into
+     */
     private int getNextStartPos(){
         int y = -1;
 
@@ -76,31 +95,60 @@ public class GraphController {
      */
     private void shiftMapDown(int y){
         Map<DataSet,Location> shiftedMap = new HashMap<>();
-
-        //compute shift
         for (DataSet set : dataMap.keySet()){
             if (dataMap.get(set).getY() >= y) {
                 Location l = dataMap.get(set);
                 shiftedMap.put(set,new Location(l.getX(),l.getY()+1));
             }
         }
-
         //out with the old
         for (DataSet set : shiftedMap.keySet()){ dataMap.remove(set); }
-
         //in with the new
         for (DataSet set : shiftedMap.keySet()){ dataMap.put(set,shiftedMap.get(set)); }
     }
 
-    //todo: add double-maxX counter to determine further join offset
+    /**
+     * Adds one column of horizontal space into the gridMap at any given x Coordinate
+     * @param x index to insert row at
+     */
+    private void shiftMapRight(int x){
+        Map<DataSet,Location> shiftedMap = new HashMap<>();
+        for (DataSet set : dataMap.keySet()){
+            if (dataMap.get(set).getX() >= x) {
+                Location l = dataMap.get(set);
+                shiftedMap.put(set,new Location(l.getX()+1,l.getY()));
+            }
+        }
+        //out with the old
+        for (DataSet set : shiftedMap.keySet()){ dataMap.remove(set); }
+        //in with the new
+        for (DataSet set : shiftedMap.keySet()){ dataMap.put(set,shiftedMap.get(set)); }
+    }
+
+
+
+    //todo: add double-maxX counter to determine further join offset (optimisation)
+    /**
+     * Updates the datamap with the positions of any added sets in the graph that don't have a position.
+     * Sometimes the topology of the graph involves performing a shift on the graph's existing components,
+     * so this function checks if that is necessary and updates the map graphic accordingly.
+     *
+     * @param graph to parse and update with
+     */
     private void updateLocations(DataGraph graph){
         for (DataSet set : graph.getDataSets()){
-            if (!dataMap.keySet().contains(set)) {
-                if (graph.numParents(set) == 1) {
+            if (!dataMap.containsKey(set)) {
+                if (graph.numParents(set) == 1) {       //transform/filter performed   (add to right)
                     DataSet parent = graph.getParent(set);
                     Location parentLocation = dataMap.get(parent);
-                    dataMap.put(set,new Location(parentLocation.getX()+1,parentLocation.getY()));
-                } else if (graph.numParents(set) > 1) {
+                    Location target = new Location(parentLocation.getX()+1,parentLocation.getY());
+
+                    if (dataMap.values().contains(target)){
+                        shiftMapRight(parentLocation.getX()+1);
+                    }
+                    dataMap.put(set,target);
+
+                } else if (graph.numParents(set) > 1) { //join operation performed    (add down)
                     List<DataSet> parents = graph.getAllParents(set);
                     int maxX = 0;
                     int maxY = 0;
@@ -114,7 +162,7 @@ public class GraphController {
                         shiftMapDown(maxY+1);
                     }
                     dataMap.put(set,target);
-                } else {    //graph is root
+                } else {                                //graph is root, init new
                     int y = getNextStartPos();
                     dataMap.put(set, new Location(START_COLUMN, y));
                 }
@@ -162,11 +210,11 @@ public class GraphController {
         sWrap.setBorder(BorderFactory.createEmptyBorder(12,12,12,12));
 
         //filter/transform button
-        JButton fbutton = new JButton("applyProcessing");
+        JButton fbutton = new JButton("   Process   ");
         fbutton.addActionListener( e -> cp.transDialog(set));
 
         //visualisation button
-        JButton vbutton = new JButton("applyVisual");
+        JButton vbutton = new JButton("    View    ");
         vbutton.addActionListener( e -> {
             cp.setSelectedVizSet(set);
             cp.getSelectedVizPlugin();
@@ -178,10 +226,6 @@ public class GraphController {
         relPanel.add(size);
         relPanel.add(fbutton);
         relPanel.add(vbutton);
-        //relPanel.setBorder(BorderFactory.createCompoundBorder(
-                //BorderFactory.createLineBorder(Color.BLACK,2,true),
-                //BorderFactory.createEmptyBorder(5,5,5,5)));
-
         relPanel.setMinimumSize(new Dimension(x,y));
 
         componentIndex.put(set,counter);
@@ -192,14 +236,24 @@ public class GraphController {
     }
 
 
+    /**
+     * Main drawing function for the DataGraph. This controls the updating of the fields and sets the appropriate
+     * sizes. It uses some ugly hacks to make GridBagLayout behave.
+     *
+     * @param graph to draw
+     * @param width of final panel
+     * @param height of final panel
+     * @return drawn panel (with *connections*!)
+     */
     JPanel drawGraphWide(DataGraph graph, int width, int height){
         updateLocations(graph);
         Location l = getMaxMap();
         int xDim = Math.min(MIN_X_COLS,l.getX());
         int yDim = Math.min(MIN_Y_ROWS,l.getY());
 
+        //reset states
         componentIndex = new HashMap<>();
-        components = new JComponent[(xDim+1)*(yDim+1)]; //reset states
+        components = new JComponent[(xDim+1)*(yDim+1)];
         counter = 0;
 
         GraphPanel graphContainer = new GraphPanel(new GridBagLayout(),graph);
@@ -217,9 +271,11 @@ public class GraphController {
 
         for (DataSet set : dataMap.keySet()){
             Location loc = dataMap.get(set);
+            //states incremented here
             addToGraph(graphContainer,loc.getX(),loc.getY(),setButton(set,width/xDim,height/yDim));
         }
 
+        //set final states pre-draw
         graphContainer.setComponents(components);
         graphContainer.setMapping(componentIndex);
         graphContainer.setMinimumSize(new Dimension(width,height));
@@ -354,9 +410,13 @@ public class GraphController {
     }
 
 
+    /**
+     * Helper class for rounded edges. Uses global statics.
+     */
     private class RoundedPanel extends JPanel{
 
         private Color borderColor;
+        private Color mainColor = Color.WHITE;
 
         RoundedPanel(GridLayout layout,Color borderColor){
             super(layout);
@@ -366,15 +426,14 @@ public class GraphController {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            Dimension arcs = new Dimension(ARC,ARC); //Border corners arcs {width,height}, change this to whatever you want
+            Dimension arcs = new Dimension(ARC,ARC);
             int width = getWidth();
             int height = getHeight();
             Graphics2D graphics = (Graphics2D) g;
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-
             //Draws the rounded panel with borders.
-            graphics.setColor(getBackground());
+            graphics.setColor(mainColor);
             graphics.fillRoundRect(0, 0, width-1, height-1, arcs.width, arcs.height);//paint background
             graphics.setColor(borderColor);
             graphics.setStroke(new BasicStroke(1.0f));

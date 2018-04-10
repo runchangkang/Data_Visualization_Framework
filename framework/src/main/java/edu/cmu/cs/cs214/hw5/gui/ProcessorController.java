@@ -8,10 +8,22 @@ import edu.cmu.cs.cs214.hw5.core.processors.Filter;
 import edu.cmu.cs.cs214.hw5.core.processors.Join;
 import edu.cmu.cs.cs214.hw5.core.processors.Transform;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller class for data processing dialogs and operations
@@ -56,14 +68,14 @@ public class ProcessorController {
                 optionButton.addActionListener(e ->{
                     if (joinList.contains(set)){
                         joinList.remove(set);
-                        System.out.println("REM");
-                        System.out.println(joinList);
+                        //System.out.println("REM");
+                        //System.out.println(joinList);
                         joinRefresh(dialog,joinList,dataSet,graph);
                     }
                     else{
                         joinList.add(set);
-                        System.out.println("ADD");
-                        System.out.println(joinList);
+                        //System.out.println("ADD");
+                        //System.out.println(joinList);
                         joinRefresh(dialog,joinList,dataSet,graph);
                     }
                 });
@@ -99,6 +111,7 @@ public class ProcessorController {
             }
         });
 
+        selectedOptions.setBorder(new EmptyBorder(0,20,50,0));
         optionPanel.add(selectedOptions);
         optionPanel.add(closeButton);
         optionPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
@@ -113,12 +126,13 @@ public class ProcessorController {
      */
     void filterDialog(DataSet dataSet, DataGraph graph){
         final JDialog dialog = new JDialog(frame, "Define Filter Expressions", true);
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
+        JPanel optionPanel = new JPanel(new BorderLayout());
 
         Map<String,String> argMap = new HashMap<>();
         List<String> defaultSet = new ArrayList<>(Arrays.asList(DataPoint.X_ATTRIB,DataPoint.Y_ATTRIB,DataPoint.T_ATTRIB));
         defaultSet.addAll(dataSet.getAttributes());
-        ControlPanel.paramFieldSet(defaultSet,argMap,optionPanel,dataSet);
+
+        optionPanel.add(ControlPanel.paramFieldSet(defaultSet,argMap,dataSet),BorderLayout.CENTER);
 
         JButton closeButton = new JButton("APPLY");
 
@@ -139,7 +153,7 @@ public class ProcessorController {
             }
         });
 
-        optionPanel.add(closeButton);
+        optionPanel.add(closeButton,BorderLayout.SOUTH);
         optionPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
         ControlPanel.display(dialog,optionPanel,frame);
     }
@@ -151,9 +165,9 @@ public class ProcessorController {
      */
     void transformDialog(DataSet dataSet,DataGraph graph){
         final JDialog dialog = new JDialog(frame, "Define Transform Expressions", true);
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
+        JPanel optionPanel = new JPanel(new BorderLayout());
         Map<String,String> argMap = new HashMap<>();
-        ControlPanel.paramFieldSet(dataSet.getAttributes(),argMap,optionPanel,null);
+        optionPanel.add(ControlPanel.paramFieldSet(dataSet.getAttributes(),argMap,null),BorderLayout.CENTER);
 
         JButton closeButton = new JButton("APPLY");
 
@@ -172,7 +186,7 @@ public class ProcessorController {
                 JOptionPane.showMessageDialog(dialog, "An error occurred while applying the transform expression.");
             }
         });
-        optionPanel.add(closeButton);
+        optionPanel.add(closeButton,BorderLayout.SOUTH);
         optionPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
         ControlPanel.display(dialog,optionPanel,frame);
     }
