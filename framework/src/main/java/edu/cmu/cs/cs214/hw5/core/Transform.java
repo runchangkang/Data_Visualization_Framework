@@ -1,8 +1,4 @@
-package edu.cmu.cs.cs214.hw5.core.processors;
-
-import edu.cmu.cs.cs214.hw5.core.DataPoint;
-import edu.cmu.cs.cs214.hw5.core.DataSet;
-import edu.cmu.cs.cs214.hw5.core.GeoDataSet;
+package edu.cmu.cs.cs214.hw5.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,14 +8,14 @@ import java.util.Map;
 /**
  * Applies a numerical processing to one DataSet based off of a set of client-defined transformations for each attribute.
  */
-public class Transform implements Processor{
+class Transform extends Processor{
     private Map<String,TransformExpression> transforms;
 
     /**
      * Instantiate a new transform with a set of client-defined attribute transform expressions
      * @param transforms
      */
-    public Transform (Map<String,String> transforms){
+    Transform (Map<String,String> transforms){
         Map<String,TransformExpression> parsedMap = new HashMap<>();
 
         for (String key: transforms.keySet()){
@@ -44,7 +40,7 @@ public class Transform implements Processor{
      * @return newly transformed DataSet
      */
     @Override
-    public DataSet apply(List<DataSet> sources) {
+    DataSet apply(List<DataSet> sources) {
         DataSet set = sources.get(0);                   //Transforms only apply to one source
 
         List<DataPoint> newList = new ArrayList<>();

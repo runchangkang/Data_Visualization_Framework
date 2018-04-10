@@ -1,11 +1,4 @@
-package edu.cmu.cs.cs214.hw5.gui;
-
-import edu.cmu.cs.cs214.hw5.core.DataGraph;
-import edu.cmu.cs.cs214.hw5.core.DataSet;
-import edu.cmu.cs.cs214.hw5.core.Parameter;
-import edu.cmu.cs.cs214.hw5.core.PluginLoader;
-import edu.cmu.cs.cs214.hw5.core.QueryableSet;
-import edu.cmu.cs.cs214.hw5.core.VisualPlugin;
+package edu.cmu.cs.cs214.hw5.core;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;

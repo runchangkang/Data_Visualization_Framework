@@ -1,8 +1,4 @@
-package edu.cmu.cs.cs214.hw5.gui;
-
-import edu.cmu.cs.cs214.hw5.core.DataGraph;
-import edu.cmu.cs.cs214.hw5.core.DataSet;
-import edu.cmu.cs.cs214.hw5.core.Relation;
+package edu.cmu.cs.cs214.hw5.core;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -32,7 +28,7 @@ import java.util.List;
 /**
  * Controller for drawing and performing DataGraph manipulations
  */
-public class GraphController {
+class GraphController {
 
     private static final int PADDING = 10;      //min graph padding
     private static final int MIN_X_COLS = 5;    //graph start

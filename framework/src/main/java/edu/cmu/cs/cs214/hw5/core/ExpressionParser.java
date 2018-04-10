@@ -1,4 +1,4 @@
-package edu.cmu.cs.cs214.hw5.core.processors;
+package edu.cmu.cs.cs214.hw5.core;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.mariuszgromada.math.mxparser.Expression;
  * Defines expression parsing using Mariusz Gromada's amazing mXparser library.
  * Takes appropriate expressions and inserts them into the framework's expression types.
  */
-public class ExpressionParser {
+class ExpressionParser {
 
     /**
      * Defines a new expression with a double return type and a single argument
@@ -48,7 +48,7 @@ public class ExpressionParser {
      * @param expression to parse
      * @return transform represented by this expression
      */
-    public static TransformExpression parseTransformExpression(String expression){
+    static TransformExpression parseTransformExpression(String expression){
         return new TransformExpression(getExpression(expression));
     }
 
@@ -57,7 +57,7 @@ public class ExpressionParser {
      * @param expression to parse
      * @return filter represented by this expression
      */
-    public static FilterExpression parseFilterExpression(String expression){
+    static FilterExpression parseFilterExpression(String expression){
         return new FilterExpression(getExpression(expression));
     }
 

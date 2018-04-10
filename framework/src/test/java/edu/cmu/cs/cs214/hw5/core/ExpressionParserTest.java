@@ -1,4 +1,4 @@
-package edu.cmu.cs.cs214.hw5.core.processors;
+package edu.cmu.cs.cs214.hw5.core;
 
 import org.junit.Assert;
 import org.junit.Test;

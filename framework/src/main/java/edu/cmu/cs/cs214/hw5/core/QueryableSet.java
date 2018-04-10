@@ -12,7 +12,7 @@ public class QueryableSet {
 
     private DataSet dataSet;
 
-    public QueryableSet(DataSet set){
+    QueryableSet(DataSet set){
         this.dataSet = set;
     }
 

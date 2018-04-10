@@ -1,11 +1,11 @@
-package edu.cmu.cs.cs214.hw5.core.processors;
+package edu.cmu.cs.cs214.hw5.core;
 
 import org.mariuszgromada.math.mxparser.Expression;
 
 /**
  * Implements double -> double transformations
  */
-public class TransformExpression {
+class TransformExpression {
 
     private Expression transformFunc;
 
@@ -23,7 +23,7 @@ public class TransformExpression {
      * @param x argument
      * @return transformation applied to argument
      */
-    public double apply(double x){
+    double apply(double x){
         transformFunc.getArgument(0).setArgumentValue(x);
         return transformFunc.calculate();
     }

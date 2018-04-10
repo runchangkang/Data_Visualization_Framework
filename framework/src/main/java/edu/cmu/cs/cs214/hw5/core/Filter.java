@@ -1,9 +1,4 @@
-package edu.cmu.cs.cs214.hw5.core.processors;
-
-import edu.cmu.cs.cs214.hw5.core.AttributeGroup;
-import edu.cmu.cs.cs214.hw5.core.DataPoint;
-import edu.cmu.cs.cs214.hw5.core.DataSet;
-import edu.cmu.cs.cs214.hw5.core.GeoDataSet;
+package edu.cmu.cs.cs214.hw5.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +8,7 @@ import java.util.Map;
 /**
  * Applies a boolean filtering to one DataSet based off of a set of client-defined filters for each attribute.
  */
-public class Filter implements Processor {
+class Filter extends Processor {
 
     private Map<String,FilterExpression> filters;
 
@@ -21,7 +16,7 @@ public class Filter implements Processor {
      * Instantiate a new filter with a set of client-defined attribute filter expressions
      * @param filters argument map
      */
-    public Filter (Map<String,String> filters){
+    Filter (Map<String,String> filters){
         Map<String,FilterExpression> parsedMap = new HashMap<>();
 
         for (String key: filters.keySet()){
@@ -43,11 +38,8 @@ public class Filter implements Processor {
      * @return newly filtered DataSet
      */
 
-    //apply all filters to all attributeSets
-
-
     @Override
-    public DataSet apply(List<DataSet> sources) {
+    DataSet apply(List<DataSet> sources) {
         DataSet set = sources.get(0);                   //Filters only apply to one source
 
         List<DataPoint> newList = new ArrayList<>();

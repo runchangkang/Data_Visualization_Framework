@@ -6,7 +6,7 @@ import java.util.Collection;
  * AttributeGroup class that holds all datapoints with the
  * given specific attribute type.
  */
-public class AttributeGroup {
+class AttributeGroup {
     private final String type;
     private ArrayList<DataPoint> dataPoints = new ArrayList<>();
 
@@ -14,7 +14,7 @@ public class AttributeGroup {
      * Initializes the AttributeGroup class with the String representation of type
      * @param type the type of the attribute
      */
-    public AttributeGroup(String type){
+    AttributeGroup(String type){
         this.type = type;
     }
 
@@ -22,7 +22,7 @@ public class AttributeGroup {
      * @param point to add
      * @exception IllegalArgumentException in case the point is not compatible with the attrgroup
      */
-    public void addDataPoint(DataPoint point){
+    void addDataPoint(DataPoint point){
         if(checkCompatibility(point)){
             dataPoints.add(point);
         }
@@ -36,7 +36,7 @@ public class AttributeGroup {
      * @param points collection of points to be added to the attribute group
      * @exception IllegalArgumentException in case the point is not compatible with the attrgroup
      */
-    public void addDataPoints(Collection<DataPoint> points){
+    void addDataPoints(Collection<DataPoint> points){
         for(DataPoint point : points){
             if(!checkCompatibility(point)){
                 throw new IllegalArgumentException("Point not compatible with AttrGroup type");
@@ -57,14 +57,14 @@ public class AttributeGroup {
     /**
      * @return all the Data Points associated to the particular instance of AttributeGroup
      */
-    public ArrayList<DataPoint> getDataPoints(){
+    ArrayList<DataPoint> getDataPoints(){
         return new ArrayList<>(dataPoints);
     }
 
     /**
      * @return how many points are in the AttributeGroup
      */
-    public int size(){
+    int size(){
         return dataPoints.size();
     }
 }

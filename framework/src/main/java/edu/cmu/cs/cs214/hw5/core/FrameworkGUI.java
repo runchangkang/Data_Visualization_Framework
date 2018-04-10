@@ -1,18 +1,16 @@
-package edu.cmu.cs.cs214.hw5.gui;
-
-import edu.cmu.cs.cs214.hw5.core.DataGraph;
+package edu.cmu.cs.cs214.hw5.core;
 
 import javax.swing.SwingUtilities;
 
 /**
  * Wrapper to dispatch the GUI
  */
-public class FrameworkGUI {
+class FrameworkGUI {
 
     /**
      * Invokes the GUI application on the EDT
      */
-    public FrameworkGUI(DataGraph graph) {
+    FrameworkGUI(DataGraph graph) {
         SwingUtilities.invokeLater(() -> createAndShowSetupScreen(graph));
     }
 

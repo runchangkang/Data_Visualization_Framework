@@ -1,11 +1,11 @@
-package edu.cmu.cs.cs214.hw5.core.processors;
+package edu.cmu.cs.cs214.hw5.core;
 
-import org.mariuszgromada.math.mxparser.*;
+import org.mariuszgromada.math.mxparser.Expression;
 
 /**
  * Implements double -> boolean filtering
  */
-public class FilterExpression {
+class FilterExpression {
 
     private Expression filterFunc;
 

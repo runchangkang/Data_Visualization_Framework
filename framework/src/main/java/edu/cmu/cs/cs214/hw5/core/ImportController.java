@@ -1,9 +1,4 @@
-package edu.cmu.cs.cs214.hw5.gui;
-
-import edu.cmu.cs.cs214.hw5.core.ClientPoint;
-import edu.cmu.cs.cs214.hw5.core.DataGraph;
-import edu.cmu.cs.cs214.hw5.core.DataPlugin;
-import edu.cmu.cs.cs214.hw5.core.PluginLoader;
+package edu.cmu.cs.cs214.hw5.core;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -22,7 +17,7 @@ import java.util.Map;
 /**
  * Controls importing DataSets with Data Plugins
  */
-public class ImportController {
+class ImportController {
 
     private String selectedDataPlugin;
     private DataGraph graph;

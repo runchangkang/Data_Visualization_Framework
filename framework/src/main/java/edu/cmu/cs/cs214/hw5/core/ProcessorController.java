@@ -1,12 +1,4 @@
-package edu.cmu.cs.cs214.hw5.gui;
-
-import edu.cmu.cs.cs214.hw5.core.DataGraph;
-import edu.cmu.cs.cs214.hw5.core.DataPoint;
-import edu.cmu.cs.cs214.hw5.core.DataSet;
-import edu.cmu.cs.cs214.hw5.core.Relation;
-import edu.cmu.cs.cs214.hw5.core.processors.Filter;
-import edu.cmu.cs.cs214.hw5.core.processors.Join;
-import edu.cmu.cs.cs214.hw5.core.processors.Transform;
+package edu.cmu.cs.cs214.hw5.core;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -28,7 +20,7 @@ import java.util.Map;
 /**
  * Controller class for data processing dialogs and operations
  */
-public class ProcessorController {
+class ProcessorController {
 
     private ControlPanel cp;
     private JFrame frame;
