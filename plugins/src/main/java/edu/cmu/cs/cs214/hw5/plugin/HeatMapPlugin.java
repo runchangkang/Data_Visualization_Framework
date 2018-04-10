@@ -99,7 +99,7 @@ public class HeatMapPlugin implements VisualPlugin{
                 colorMap.put(attr,colors[random.nextInt(colors.length-1)]);
                 double[] minMax = this.getMinMax(queryableSet.getAttributeGroup(attr),attr);
                 for (DataPoint dataPoint : queryableSet.getAttributeGroup(attr)) {
-                    String name = attr+dataPoint.getX()+dataPoint.getY()+dataPoint.getT();
+                    String name = attr+dataPoint.getX()+dataPoint.getY()+dataPoint.getT()+random.nextInt(100000);
                     XYSeries series = xyChart.addSeries(name,new double[]{dataPoint.getX()},new double[]{dataPoint.getY()});
                     Color thisColor = this.getColor(minMax,dataPoint.getAttribute(attr),colorMap.get(attr),WHITE,alpha);
                     series.setMarkerColor(thisColor);

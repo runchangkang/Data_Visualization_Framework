@@ -1,5 +1,8 @@
 package edu.cmu.cs.cs214.hw5.core;
 
+import edu.wlu.cs.levy.CG.KDTree;
+import edu.wlu.cs.levy.CG.KeySizeException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -10,7 +13,7 @@ import java.util.Set;
  * about the source data and implement a flexible range of plug-ins.
  */
 public class QueryableSet {
-
+    private final static int NEAREST_POINTS_AMOUNT = 5;
     private DataSet dataSet;
 
     QueryableSet(DataSet set){
@@ -30,7 +33,18 @@ public class QueryableSet {
      * @return interpolated attribute value for this point.
      */
     public double querySet (int x, int y, int t, String attribute){
-        return dataSet.getAttributeGroup(attribute).getDataPoints().get(0).getAttribute(attribute);
+        AttributeGroup attributeGroup = dataSet.getAttributeGroup(attribute);
+        KDTree kdTree = attributeGroup.getKdTree();
+        List<DataPoint> dataPoints = new ArrayList<>();
+        try{dataPoints = kdTree.nearest(new double[]{(double)x,(double)y,(double)t},NEAREST_POINTS_AMOUNT);}
+        catch (KeySizeException e1){}
+
+        double sum = 0;
+        for(DataPoint dataPoint : dataPoints){
+            sum += dataPoint.getAttribute(attribute);
+        }
+
+        return sum/(double)NEAREST_POINTS_AMOUNT;
     }
 
     /**
