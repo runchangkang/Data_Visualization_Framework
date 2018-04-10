@@ -100,7 +100,7 @@ public class CSVReader implements DataPlugin {
             }
         }
 
-        System.out.println("finished collxn");
+        //System.out.println("finished collxn");
         return pointList;
     }
 

@@ -46,15 +46,26 @@ public class DataPoint {
         }
     }
 
+    /**
+     * Set a point's label
+     * @param s label to set
+     */
     public void addLabel(String s){
         this.label = s;
     }
 
+    /**
+     * //Todo: implement visualisation plugin using this feature
+     * @return Label applied to pt.
+     */
     public String getLabel(){
         return this.label;
     }
 
-    public boolean hasLabel(){
+    /**
+     * @return whether point has a meaningful label or not
+     */
+    private boolean hasLabel(){
         return !"".equals(this.label.replaceAll("\\s",""));
     }
 

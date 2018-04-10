@@ -1,6 +1,11 @@
 package edu.cmu.cs.cs214.hw5.core;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The DataSet interface which the client and the framework can see.
@@ -51,6 +56,13 @@ public abstract class DataSet {
         return newGroup;
     }
 
+    /**
+     * Get the absolute minimum value of a given attribute in a dataset's collection
+     * Especially useful in parameterising filters and sliders.
+     *
+     * @param attribute to get min
+     * @return min value
+     */
     public double getMin(String attribute){
         double x = Double.MAX_VALUE;
 
@@ -59,10 +71,14 @@ public abstract class DataSet {
                 x = Math.min(pt.getAttribute(attribute),x);
             }
         }
-
         return x;
     }
 
+    /**
+     * Get the absolute maximum value of a given attribute in a dataset's collection
+     * @param attribute to get max
+     * @return max value
+     */
     public double getMax(String attribute){
         double x = -Double.MAX_VALUE;
 
@@ -71,7 +87,6 @@ public abstract class DataSet {
                 x = Math.max(pt.getAttribute(attribute),x);
             }
         }
-
         return x;
     }
 
@@ -107,7 +122,7 @@ public abstract class DataSet {
     }
   
     /** 
-     * Prints the pointset for debugging purpose
+     * Prints the pointset for debugging purposes
      */
     public void printSet(){
         System.out.println(name + " : " + pointSet.size() + " values");

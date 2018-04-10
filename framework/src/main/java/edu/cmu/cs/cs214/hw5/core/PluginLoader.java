@@ -24,7 +24,7 @@ public class PluginLoader {
 
         for (DataPlugin p : ServiceLoader.load(DataPlugin.class)){
             pluginList.add(p.getName());
-            System.out.println(p.getName());
+            //System.out.println(p.getName());
         }
 
         return pluginList;
@@ -56,7 +56,7 @@ public class PluginLoader {
 
         for (VisualPlugin p : ServiceLoader.load(VisualPlugin.class)){
             pluginList.add(p.getName());
-            System.out.println(p.getName());
+            //System.out.println(p.getName());
         }
 
         return pluginList;

@@ -19,7 +19,7 @@ public class Filter implements Processor {
 
     /**
      * Instantiate a new filter with a set of client-defined attribute filter expressions
-     * @param filters
+     * @param filters argument map
      */
     public Filter (Map<String,String> filters){
         Map<String,FilterExpression> parsedMap = new HashMap<>();

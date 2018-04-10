@@ -5,10 +5,19 @@ import edu.cmu.cs.cs214.hw5.core.DataGraph;
 import edu.cmu.cs.cs214.hw5.core.DataPlugin;
 import edu.cmu.cs.cs214.hw5.core.PluginLoader;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controls importing DataSets with Data Plugins
@@ -47,7 +56,8 @@ public class ImportController {
             JButton button = new JButton(pluginName);
             button.addActionListener(e -> {
                 this.selectedDataPlugin = pluginName;
-                System.out.println(this.selectedDataPlugin);});
+                //System.out.println(this.selectedDataPlugin);
+            });
             optionPanel.add(button);
         }
 
@@ -73,15 +83,16 @@ public class ImportController {
      */
     private void dataPluginDialog(String selectedDataPlugin, JFrame frame){
         DataPlugin dp = PluginLoader.getDataPlugin(selectedDataPlugin);
+        if (dp == null) return;
+
         List<String> options = new ArrayList<>(Collections.singletonList(NAME));
         options.addAll(dp.getPopupParameters());
-        final JDialog dialog = new JDialog(frame, "Select a DataSet Plugin", true);
 
+        final JDialog dialog = new JDialog(frame, "Select a DataSet Plugin", true);
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
 
         Map<String,String> argMap = new HashMap<>();
-
-        ControlPanel.paramFieldSet(options,argMap,optionPanel,null);
+        optionPanel.add(ControlPanel.paramFieldSet(options,argMap,null));
 
         JPanel wrapper = new JPanel();
         JButton closeButton = new JButton("CREATE");
@@ -89,7 +100,7 @@ public class ImportController {
             if(verifyMap(argMap,options)){
                 try {
                     Collection<ClientPoint> dSet = dp.getCollection(argMap);
-                    System.out.println(argMap.get("N"));
+                    //System.out.println(argMap.get("N"));
                     graph.addClientSet(dSet,argMap.get(NAME));
                     dialog.setVisible(false);
                     cp.addStartScreen();
