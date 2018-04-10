@@ -18,7 +18,7 @@ public class AQIReaderTest {
     @Test
     public void parsing() throws Exception {
         Map<String, String> city = new HashMap<>();
-        city.put("City", "Beijing");
+        city.put("City", "New York");
         Collection<ClientPoint> clientPoints = aqi.getCollection(city);
     }
 }
