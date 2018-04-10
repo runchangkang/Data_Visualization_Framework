@@ -2,13 +2,13 @@ package edu.cmu.cs.cs214.hw5.gui;
 
 import edu.cmu.cs.cs214.hw5.core.DataGraph;
 import edu.cmu.cs.cs214.hw5.core.DataSet;
+import edu.cmu.cs.cs214.hw5.core.Relation;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -28,6 +28,10 @@ public class GraphController {
     private ControlPanel cp;
     private Map<DataSet, Location> dataMap = new HashMap<>();
     private GridBagConstraints constraints= new GridBagConstraints();
+
+    private JComponent[] components;
+    private int counter;
+    private Map<DataSet,Integer> componentIndex;
 
     /**
      * Instantiates a new graph controller
@@ -49,10 +53,8 @@ public class GraphController {
      * @param dataset
      */
     private void addToGraph(JPanel graphPanel, int x, int y, JPanel dataset){
-        //JPanel panel = new JPanel(new BorderLayout());
         constraints.gridx = x;
         constraints.gridy = y;
-        //panel.add(dataset,BorderLayout.CENTER);
         graphPanel.add(dataset, constraints);
     }
 
@@ -168,6 +170,11 @@ public class GraphController {
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
         relPanel.setMinimumSize(new Dimension(x,y));
+
+        componentIndex.put(set,counter);
+        components[counter] = relPanel;
+        counter++;
+
         return relPanel;
     }
 
@@ -178,17 +185,18 @@ public class GraphController {
         int xDim = Math.min(MIN_X_COLS,l.getX());
         int yDim = Math.min(MIN_Y_ROWS,l.getY());
 
-        JPanel graphContainer = new JPanel(new GridBagLayout());
+        componentIndex = new HashMap<>();
+        components = new JComponent[(xDim+1)*(yDim+1)]; //reset states
+        counter = 0;
+
+        GraphPanel graphContainer = new GraphPanel(new GridBagLayout(),graph);
 
         for (int i = 0; i <= yDim; i++){
             for (int j = 0; j <= xDim; j++){
                 if (!dataMap.values().contains(new Location(j,i))) {
                     JPanel panel = new JPanel();
-                    //System.out.println("W: "+ width/xDim);
-                    //System.out.println("H: "+ height/yDim);
                     panel.setMinimumSize(new Dimension(width/xDim,height/yDim));
                     panel.add(new JLabel("(" + j + "," + i + ")"));
-                    //panel.setBorder(new LineBorder(Color.BLACK, 4));
                     addToGraph(graphContainer,j,i,panel);
                 }
             }
@@ -199,6 +207,8 @@ public class GraphController {
             addToGraph(graphContainer,loc.getX(),loc.getY(),setButton(set,width/xDim,height/yDim));
         }
 
+        graphContainer.setComponents(components);
+        graphContainer.setMapping(componentIndex);
         graphContainer.setMinimumSize(new Dimension(width,height));
         return graphContainer;
     }
@@ -212,7 +222,7 @@ public class GraphController {
      * @param width allowed of graph
      * @return drawn panel w/ buttons & listeners
      */
-    JPanel drawGraph(DataGraph graph, int height, int width){
+    /*JPanel drawGraph(DataGraph graph, int height, int width){
         JPanel containerPanel = new JPanel(new BorderLayout());
         GridLayout padLayout = new GridLayout(0,1);
         padLayout.setVgap(20);
@@ -268,7 +278,7 @@ public class GraphController {
             compSet[j] = relPanel;
             j++;
         }
-        gPanel.addCompSet(compSet); //gives the gPanel the graph components to draw //todo: add relationships
+        //gPanel.addCompSet(compSet); //gives the gPanel the graph components to draw //todo: add relationships
 
         //extra buffer space
         for (int i = 0; i < 4 - graph.getRelations().size(); i++){
@@ -279,7 +289,7 @@ public class GraphController {
         gPanel.setSize(new Dimension(width,height));
         containerPanel.add(gPanel,BorderLayout.NORTH);
         return gPanel;
-    }
+    }*/
 
     /**
      * GraphPanel will draw lines btwn all of the components (inside it) that it is given
@@ -287,10 +297,13 @@ public class GraphController {
      */
     class GraphPanel extends JPanel{
 
-        private JComponent[] compSet; //components to draw
+        private List<Relation> relations;
+        private JComponent[] components;
+        private Map<DataSet,Integer> mapping;
 
-        GraphPanel(GridLayout layout){
+        GraphPanel(GridBagLayout layout, DataGraph graph){
             super(layout);
+            this.relations = graph.getRelations();
         }
 
         @Override
@@ -299,14 +312,14 @@ public class GraphController {
 
             Graphics2D g2d = (Graphics2D) g;
 
-            Component[] c = compSet;
-            for(int j = 0; j < c.length; j++) {
-                Point2D.Double p1 = getCenter(c[j]);
-                for(int k = j+1; k < c.length; k++) {
-                    Point2D p2 = getCenter(c[k]);
-                    g2d.setStroke(new BasicStroke(2f));
-                    g2d.draw(new Line2D.Double(p1, p2));
-                }
+            for (Relation r : relations){
+                JComponent parent = this.components[mapping.get(r.getSource())];
+                JComponent child = this.components[mapping.get(r.getResult())];
+
+                Point2D.Double p1 = getCenter(parent);
+                Point2D p2 = getCenter(child);
+                g2d.setStroke(new BasicStroke(2f));
+                g2d.draw(new Line2D.Double(p1, p2));
             }
         }
 
@@ -318,8 +331,12 @@ public class GraphController {
             return p;
         }
 
-        void addCompSet(JComponent[] compSet){
-            this.compSet = compSet;
+        private void setComponents(JComponent[] components){
+            this.components = components;
+        }
+
+        private void setMapping(Map<DataSet,Integer> mapping){
+            this.mapping = mapping;
         }
     }
 
