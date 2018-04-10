@@ -4,7 +4,7 @@ package edu.cmu.cs.cs214.hw5.core;
  * Defines an interface parameter as specified by a visualisation plugin.
  * Functions as an (immutable) container class for the framework to read.
  */
-public class Parameter {
+class Parameter {
 
     private final double min;
     private final double max;
@@ -25,21 +25,21 @@ public class Parameter {
     /**
      * @return max slider value
      */
-    public double getMax() {
+    double getMax() {
         return max;
     }
 
     /**
      * @return min slider value
      */
-    public double getMin() {
+    double getMin() {
         return min;
     }
 
     /**
      * @return slider label
      */
-    public String getName() {
+    String getName() {
         return name;
     }
 }

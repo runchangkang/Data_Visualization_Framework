@@ -11,7 +11,7 @@ import java.util.Set;
  * The DataSet interface which the client and the framework can see.
  * This is the overall structure of the data in the GeoFilter framework.
  */
-public abstract class DataSet {
+abstract class DataSet {
 
     //protected Map<String,AttributeGroup> attributeGroups;
     protected Set<String> attributes = new HashSet<>();
@@ -23,7 +23,7 @@ public abstract class DataSet {
      * @param name name of the Data Set
      * @param existingPoints the already existing datapoints to use for the dataset
      */
-    public DataSet(String name, List<DataPoint> existingPoints){
+    DataSet(String name, List<DataPoint> existingPoints){
         if(existingPoints != null) {
             this.pointSet.addAll(existingPoints);
             for (DataPoint pt : existingPoints) {
@@ -40,13 +40,13 @@ public abstract class DataSet {
      * @param t the t, or time, coordinate of the data
      * @param attributes a map of various attributes, with the name mapped to the value
      */
-    public abstract void makePoint(double x, double y, double t, Map<String, Double> attributes, String label);
+    abstract void makePoint(double x, double y, double t, Map<String, Double> attributes, String label);
 
     /**
      * @param attribute the string attribute
      * @return this dataset's container associated with that attribute
      */
-    public AttributeGroup getAttributeGroup(String attribute){
+    AttributeGroup getAttributeGroup(String attribute){
         AttributeGroup newGroup = new AttributeGroup(attribute);
         for (DataPoint pt : pointSet) {
             if (pt.hasAttr(attribute)) {
@@ -63,7 +63,7 @@ public abstract class DataSet {
      * @param attribute to get min
      * @return min value
      */
-    public double getMin(String attribute){
+    double getMin(String attribute){
         double x = Double.MAX_VALUE;
 
         for (DataPoint pt : pointSet) {
@@ -79,7 +79,7 @@ public abstract class DataSet {
      * @param attribute to get max
      * @return max value
      */
-    public double getMax(String attribute){
+    double getMax(String attribute){
         double x = -Double.MAX_VALUE;
 
         for (DataPoint pt : pointSet) {
@@ -93,7 +93,7 @@ public abstract class DataSet {
     /**
      * @return all of the attributes this set currently contains
      */
-    public Set<String> getAttributes(){
+    Set<String> getAttributes(){
         return new HashSet<>(attributes);
     }
 
@@ -102,7 +102,7 @@ public abstract class DataSet {
      *
      * @return the name of the dataset in string
      */
-    public String getName(){
+    String getName(){
         return this.name;
     }
 
@@ -110,21 +110,21 @@ public abstract class DataSet {
      *
      * @return all datapoints in the dataset
      */
-    public Collection<DataPoint> getDataPoints(){
+    Collection<DataPoint> getDataPoints(){
         return new ArrayList<>(this.pointSet);
     }
 
     /**
      * @return number of datapoints in the set
      */
-    public int size(){
+    int size(){
         return pointSet.size();
     }
   
     /** 
      * Prints the pointset for debugging purposes
      */
-    public void printSet(){
+    void printSet(){
         System.out.println(name + " : " + pointSet.size() + " values");
         for (DataPoint pt : pointSet){
             System.out.println(pt);

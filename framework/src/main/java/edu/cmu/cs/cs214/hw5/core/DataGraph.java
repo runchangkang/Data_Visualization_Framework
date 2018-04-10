@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Overall representation of all of the processing operations in one client session
  */
-public class DataGraph {
+class DataGraph {
 
     private List<DataSet> dataSets = new ArrayList<>();
     private List<Relation> relations = new ArrayList<>();
