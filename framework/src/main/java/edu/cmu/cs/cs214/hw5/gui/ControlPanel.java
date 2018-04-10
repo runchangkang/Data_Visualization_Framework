@@ -66,7 +66,6 @@ public class ControlPanel extends JPanel{
 
         panel.add(pluginWindow(),BorderLayout.WEST);
         panel.add(graphWindow(),BorderLayout.CENTER);
-        panel.add(vizWindow(),BorderLayout.EAST);
 
         add(panel);
         this.revalidate();
@@ -112,9 +111,9 @@ public class ControlPanel extends JPanel{
      */
     private JPanel graphWindow(){
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(gc.drawGraph(graph,WINDOW_HEIGHT-100,GRAPH_WIDTH));
+        panel.add(gc.drawGraphWide(graph,WINDOW_WIDTH-PLUGIN_WIDTH,WINDOW_HEIGHT),BorderLayout.CENTER);
         panel.add(createButton(),BorderLayout.SOUTH);
-        panel.setPreferredSize(new Dimension(GRAPH_WIDTH,WINDOW_HEIGHT));
+        //panel.setPreferredSize(new Dimension(WINDOW_WIDTH-PLUGIN_WIDTH,WINDOW_HEIGHT));
         return panel;
     }
 
@@ -130,17 +129,18 @@ public class ControlPanel extends JPanel{
 
     /**
      * MAIN METHOD FOR VISUALISATION PLUGIN IMPLEMENTATION
-     * //Todo: Only works with one visualisation right now. hack it to work with multiple? // overlay?
-     *          -> swing has something called glasspanel which might allow call paintComponent of diff panel over other
+     * get this to work.
+     *
      * //Todo: MOVE INTO VIZCONTROLLER CLASS
      *
      * @return JPanel with the visualisation interface
      */
-    private JPanel vizWindow(){
+     void vizWindow(){
         JPanel panel = new JPanel(new BorderLayout());
 
         //Default case: a visualisation has not yet been initialised
         if (selectedVizSet == null || selectedVizPlugin == null) {
+            System.out.println("Something is null");
             JButton params = new JButton("Parameters");
             params.setPreferredSize(new Dimension(VIZ_WIDTH, 100));
             panel.add(params, BorderLayout.NORTH);
@@ -148,6 +148,9 @@ public class ControlPanel extends JPanel{
             panel.setPreferredSize(new Dimension(VIZ_WIDTH, WINDOW_HEIGHT));
         }
         else{  //okok Let's draw it!
+            JDialog visualDisplay = new JDialog(frame, "Displaying " +
+                    this.selectedVizSet.getName() + " with " + this.selectedVizPlugin, false);
+
             VisualPlugin plugin = PluginLoader.getVizPlugin(this.selectedVizPlugin);
 
             Map<String,Double> argMap = new HashMap<>();
@@ -183,9 +186,9 @@ public class ControlPanel extends JPanel{
             container.add(drawnViz);
             panel.add(container,BorderLayout.CENTER);
             panel.setPreferredSize(new Dimension(VIZ_WIDTH,WINDOW_HEIGHT));
-        }
 
-        return panel;
+            display(visualDisplay,panel,frame);
+        }
     }
 
     /**
