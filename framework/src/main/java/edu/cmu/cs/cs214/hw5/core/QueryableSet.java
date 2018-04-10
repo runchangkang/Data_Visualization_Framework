@@ -12,6 +12,7 @@ import java.util.*;
  */
 public class QueryableSet {
     private final static int NEAREST_POINTS_AMOUNT = 5;
+    private final static int P_VALUE = 5;
     private DataSet dataSet;
     private Map<String,KDTree<DataPoint>> kdTrees = new HashMap<>();
 
@@ -40,30 +41,49 @@ public class QueryableSet {
      * @param attribute to get the value of
      * @return interpolated attribute value for this point.
      */
-    public double querySet (int x, int y, int t, String attribute){
+    public double querySet (double x, double y, double t, String attribute){
         KDTree<DataPoint> queryTree = kdTrees.get(attribute);
         List<DataPoint> dataPoints = new ArrayList<>();
         try{
-            double[] queryPt = {(double)x,(double)y,(double)t};
+            double[] queryPt = {x,y,t};
             dataPoints = queryTree.nearest(queryPt,NEAREST_POINTS_AMOUNT);
         }
         catch (KeySizeException e1){
             e1.printStackTrace();
         }
 
-        double sum = 0;
+        double[] distances = new double[dataPoints.size()];
+
+        int i = 0;
         for(DataPoint point : dataPoints){
-            sum += point.getAttribute(attribute);
-        }
-        if(sum == 0) return 0;
-        else{
-            double total = 0;
-            for (DataPoint point : dataPoints){
-                double attr = point.getAttribute(attribute);
-                total += attr * (1.0 - (attr/sum));
+            double dist = getDistance(point,x,y,t);
+            if (Math.abs(dist) < 0.000001){ //we've basically nailed it
+                return point.getAttribute(attribute);
             }
-            return total/NEAREST_POINTS_AMOUNT;
+            distances[i] = dist;
+            i++;
         }
+
+        double total1 = 0;
+        double total2 = 0;
+        int j = 0;
+        //Inverse distance weighting (Shepard) : https://en.wikipedia.org/wiki/Inverse_distance_weighting
+        for (DataPoint point : dataPoints){
+            double attr = point.getAttribute(attribute);
+            double metric = Math.pow(distances[j],P_VALUE);
+            total1 += attr / metric;
+            total2 += 1 / metric;
+            j++;
+        }
+        return (total1/total2);
+    }
+
+
+    private double getDistance(DataPoint p, double x, double y, double t){
+        double xDist = x - p.getX();
+        double yDist = y - p.getY();
+        double tDist = x - p.getT();
+        return  (xDist * xDist) + (yDist*yDist) + (tDist*tDist);
     }
 
     /**

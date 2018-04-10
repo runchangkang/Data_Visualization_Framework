@@ -193,8 +193,11 @@ class ControlPanel extends JPanel{
              *     -> The container is reset and fully redrawn with new argMap on slider change
              */
 
-            JPanel params = new JPanel(new BorderLayout());
+            JPanel paramWrapper = new JPanel(new GridLayout(0,1));
+
             for (Parameter p : plugin.addInterfaceParameters().getParameters()){
+                JPanel params = new JPanel(new BorderLayout());
+                System.out.println(p.getName());
                 argMap.put(p.getName(), (p.getMin() + p.getMax()) / 2);
                 JLabel label = new JLabel(p.getName() + "    " + new DecimalFormat("####.##").format(p.getMin()));
                 JSlider slider = new JSlider((int) p.getMin(), (int) p.getMax());
@@ -209,8 +212,9 @@ class ControlPanel extends JPanel{
                 params.add(label,BorderLayout.WEST);
                 params.add(slider,BorderLayout.CENTER);
                 params.add(max,BorderLayout.EAST);
+                paramWrapper.add(params);
             }
-            panel.add(params,BorderLayout.NORTH);
+            panel.add(paramWrapper,BorderLayout.NORTH);
 
 
             JPanel drawnViz = drawViz(plugin,argMap);
