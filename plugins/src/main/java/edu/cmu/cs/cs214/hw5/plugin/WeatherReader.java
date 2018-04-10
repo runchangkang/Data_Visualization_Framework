@@ -105,7 +105,7 @@ public class WeatherReader implements DataPlugin {
                 attrs.put("windDegree", windDegree);
                 attrs.put("rain3h", rain3h);
 
-                ClientPoint cp = new ClientPoint(lon, lat, time, attrs);
+                ClientPoint cp = new ClientPoint(lon, lat, time, attrs, "3 Hour Incremental");
                 pointList.add(cp);
             }
 
