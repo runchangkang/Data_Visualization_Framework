@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper class for multiple parameters (see: Parameter)
+ * A list of parameters created by Visualisation Plugins for the framework to display as sliders.
+ * A ParameterList is instantiated and then arbitrarily many parameters are added as desired.
  */
 public class ParameterList {
 
@@ -23,7 +24,7 @@ public class ParameterList {
     /**
      * @return snapshot of currently instantiated parameters
      */
-    public List<Parameter> getParameters(){
+    List<Parameter> getParameters(){
         return new ArrayList<>(parameterList);
     }
 }

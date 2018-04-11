@@ -10,5 +10,6 @@ repositories {
 
 dependencies {
     compile name: 'MathParser.org-mXparser-jdk18-4.1.1'
+    compile name: 'kd'
     testCompile 'junit:junit:4.12'
 }

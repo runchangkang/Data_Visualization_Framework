@@ -83,7 +83,8 @@ public class ScatterPlugin implements VisualPlugin {
 
             chart = this.addData(chart);
             chart.getStyler().setChartBackgroundColor(new Color(255 - baseColorIndex, 255 - baseColorIndex, 255 - baseColorIndex));
-
+            chart.getStyler().setToolTipType(Styler.ToolTipType.yLabels);
+            chart.getStyler().setToolTipsEnabled(true);
             this.add(new XChartPanel<XYChart>(chart), BorderLayout.CENTER);
 
 
@@ -106,6 +107,7 @@ public class ScatterPlugin implements VisualPlugin {
                 for(Double key:dataMap.keySet()){
                     timeValue.add(key);
                     value.add(dataMap.get(key));
+
 
                 }
                 xyChart.addSeries(attr, todoublePrimitive(timeValue), todoublePrimitive(value));
