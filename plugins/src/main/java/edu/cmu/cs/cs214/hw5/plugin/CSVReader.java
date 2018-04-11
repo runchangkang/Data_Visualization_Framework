@@ -7,7 +7,12 @@ import org.supercsv.io.CsvMapReader;
 import org.supercsv.prefs.CsvPreference;
 
 import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Parses a CSV file using user-defined parameters. Each row represents a DataPoint.
@@ -35,7 +40,7 @@ public class CSVReader implements DataPlugin {
      *          <"Y","Y">,
      *          <"T","Time">
      *          <"Attributes","Wind,Light,Temperature">>
-     *          //todo: have variable numbers of user-defined attributes to be able to match other datasets?
+     *           //todo: add this in the pop-up panel
      *
      * @param argumentMap map of arguments from user
      * @return collection of data ready to be made into a DataSet
@@ -84,23 +89,21 @@ public class CSVReader implements DataPlugin {
                 double y = Double.parseDouble((String) values.get(ycol));
                 double z = Double.parseDouble((String) values.get(tcol));
 
-                //Todo: the assumption here is that all rows have all attributes. This might not be the case.
                 Map<String,Double> attributeMap = new HashMap<>();
                 for (String attribute : attrCols){
-                    attributeMap.put(attribute,Double.parseDouble((String) values.get(attribute)));
+                    if (values.containsKey(attribute)) {
+                        attributeMap.put(attribute, Double.parseDouble((String) values.get(attribute)));
+                    }
                 }
                 ClientPoint p = new ClientPoint(x,y,z,attributeMap,"");
-                //System.out.println(p);
                 pointList.add(p);
             }
         }
         finally{
-            if( reader != null ) {
+            if(reader != null) {
                 reader.close();
             }
         }
-
-        //System.out.println("finished collxn");
         return pointList;
     }
 
