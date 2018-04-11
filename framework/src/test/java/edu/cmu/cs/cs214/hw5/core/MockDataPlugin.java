@@ -27,7 +27,7 @@ public class MockDataPlugin implements DataPlugin{
     @Override
     public Collection<ClientPoint> getCollection(Map<String, String> argumentMap) throws Exception {
         ArrayList<ClientPoint> cpList = new ArrayList<>();
-        Map<String, Double> attrs1 = new HashMap<String, Double>();
+        Map<String, Double> attrs1 = new HashMap<>();
         attrs1.put("attr1", 10.0);
         attrs1.put("attr2", 11.0);
         attrs1.put("attr3", 12.0);

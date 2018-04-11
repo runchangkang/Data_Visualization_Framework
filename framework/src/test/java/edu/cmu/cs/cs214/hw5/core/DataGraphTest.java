@@ -33,7 +33,7 @@ public class DataGraphTest {
             }
         }
         p = new Join();
-        rl = new Relation(d1, p, d2);
+        rl = new Relation(d1, d2);
 
         dg.addRelation(rl);
 
@@ -71,7 +71,7 @@ public class DataGraphTest {
         attrs.put("AQI", 1.0);
         DataPoint point = new DataPoint(1.001, 2.001, 3.001, attrs);
         dg.addDataSet(geo);
-        Relation rl2 = new Relation(geo, p, d2);
+        Relation rl2 = new Relation(geo, d2);
         dg.addRelation(rl2);
         assertEquals(2, dg.numParents(d2));
     }
@@ -90,7 +90,7 @@ public class DataGraphTest {
         attrs.put("AQI", 1.0);
         DataPoint point = new DataPoint(1.001, 2.001, 3.001, attrs);
         dg.addDataSet(geo);
-        Relation rl2 = new Relation(geo, p, d2);
+        Relation rl2 = new Relation(geo, d2);
         dg.addRelation(rl2);
         assertEquals(new ArrayList<>(Arrays.asList(d1, geo)), dg.getAllParents(d2));
     }

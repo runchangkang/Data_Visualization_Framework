@@ -6,18 +6,15 @@ package edu.cmu.cs.cs214.hw5.core;
 class Relation {
     private DataSet source;
     private DataSet target;
-    private Processor processor;
 
     /**
      * Instantiates the relationship within the DataGraph model.
      * @param source DataSets to apply processing to
-     * @param processor to apply processing with
+     * @param target Set with processing applied
      */
-    Relation(DataSet source, Processor processor, DataSet target){
+    Relation(DataSet source, DataSet target){
         this.source = source;
-        this.processor = processor;
         this.target = target;
-        //System.out.println(target.getName()+" LEN:" + target.getDataPoints().size());
     }
 
     /**

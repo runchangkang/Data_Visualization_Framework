@@ -40,7 +40,7 @@ public class PixelMap implements VisualPlugin {
         double time = results.get(TIME_PARAM);
         double spacing = results.get(SPACING_PARAM);
         double param = results.get(PARAM_PARAM);
-        JPanel panel = new MapPanel(qSet, x, y, color, time, spacing);
+        JPanel panel = new MapPanel(qSet, x, y, color, time, spacing, param);
         panel.setPreferredSize(new Dimension(x,y));
 
         return panel;
@@ -64,12 +64,12 @@ public class PixelMap implements VisualPlugin {
         private float color;
         private double time;
 
-        private String nextParam; //todo: make better parameter selector
+        private String nextParam;
         private double paramMax;
         private double paramMin;
         private double paramRange;
 
-        MapPanel(QueryableSet qSet, int x, int y, double color, double time, double spacing){
+        MapPanel(QueryableSet qSet, int x, int y, double color, double time, double spacing, double param){
             this.qSet = qSet;
             this.width = x;
             this.height = y;
@@ -77,12 +77,14 @@ public class PixelMap implements VisualPlugin {
             this.color =  (float) (color/360.0);
             this.intspacing = (int) spacing;
             this.time = time;
+            param = param/100.0;
 
             if (qSet.getAttributes().size() > 0){
-               nextParam = qSet.getAttributes().toArray(new String[1])[0];
-               paramMin = getMin(qSet,nextParam);
-               paramMax = getMax(qSet,nextParam);
-               paramRange = paramMax - paramMin;
+                int index = Math.max((int) (qSet.getAttributes().size() * param), qSet.getAttributes().size() -1);
+                nextParam = qSet.getAttributes().toArray(new String[qSet.getAttributes().size()])[index];
+                paramMin = getMin(qSet,nextParam);
+                paramMax = getMax(qSet,nextParam);
+                paramRange = paramMax - paramMin;
             }
 
             this.minx = getMin(qSet,DataPoint.X_ATTRIB);

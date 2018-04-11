@@ -1,6 +1,8 @@
 package edu.cmu.cs.cs214.hw5.core;
 
 import edu.wlu.cs.levy.CG.KDTree;
+import edu.wlu.cs.levy.CG.KeyDuplicateException;
+import edu.wlu.cs.levy.CG.KeySizeException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +37,7 @@ class AttributeGroup {
                 this.kdTree.insert(new double[]{point.getX(),point.getY(),point.getT()},point);
             }
             catch (Exception e1){
+                //key must already be in here. So we go on as planned.
                 //e1.printStackTrace();
             }
         }

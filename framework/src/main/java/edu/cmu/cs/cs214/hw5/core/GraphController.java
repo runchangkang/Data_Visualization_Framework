@@ -123,7 +123,6 @@ class GraphController {
 
 
 
-    //todo: add double-maxX counter to determine further join offset (optimisation)
     /**
      * Updates the datamap with the positions of any added sets in the graph that don't have a position.
      * Sometimes the topology of the graph involves performing a shift on the graph's existing components,
@@ -143,7 +142,6 @@ class GraphController {
                         shiftMapRight(parentLocation.getX()+1);
                     }
                     dataMap.put(set,target);
-                //todo: join landing under last shift down if needed
                 } else if (graph.numParents(set) > 1) { //join operation performed    (add down)
                     List<DataSet> parents = graph.getAllParents(set);
                     int maxX = 0;
@@ -254,12 +252,12 @@ class GraphController {
 
         GraphPanel graphContainer = new GraphPanel(new GridBagLayout(),graph);
 
+
         for (int i = 0; i <= yDim; i++){
-            for (int j = 0; j <= xDim; j++){ //todo: if !rowContainsElement() for top & bottom rows (L/R col still ++)
-                if (!dataMap.values().contains(new Location(j,i)) && (i == 0 || j == 0 || i == yDim || j == xDim)){
+            for (int j = 0; j <= xDim; j++){
+                if (!dataMap.values().contains(new Location(j,i)) && (j == 0 || i == yDim || j == xDim)){
                     JPanel panel = new JPanel();
                     panel.setMinimumSize(new Dimension(width/xDim,height/yDim));
-                    //panel.add(new JLabel("(" + j + "," + i + ")"));
                     addToGraph(graphContainer,j,i,panel);
                 }
             }

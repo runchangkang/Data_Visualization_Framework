@@ -40,7 +40,6 @@ public class CSVReader implements DataPlugin {
      *          <"Y","Y">,
      *          <"T","Time">
      *          <"Attributes","Wind,Light,Temperature">>
-     *           //todo: add this in the pop-up panel
      *
      * @param argumentMap map of arguments from user
      * @return collection of data ready to be made into a DataSet

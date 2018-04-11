@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'findbugs'
 
 repositories {
     flatDir {
@@ -8,8 +9,23 @@ repositories {
     mavenCentral()
 }
 
+test.testLogging {
+    exceptionFormat "full"; events "failed", "passed", "skipped"
+}
+
 dependencies {
     compile name: 'MathParser.org-mXparser-jdk18-4.1.1'
     compile name: 'kd'
     testCompile 'junit:junit:4.12'
+}
+
+findbugs {
+    ignoreFailures = true
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
 }

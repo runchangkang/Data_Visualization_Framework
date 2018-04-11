@@ -55,8 +55,7 @@ public class HeatMapPlugin implements VisualPlugin{
      */
     @Override
     public JPanel drawSet(QueryableSet qSet, int x, int y, Map<String, Double> results) {
-        JPanel jPanel = new DrawPanel(qSet,x,y,results.get(ALPHA));
-        return jPanel;
+        return new DrawPanel(qSet,x,y,results.get(ALPHA));
     }
     class DrawPanel extends  JPanel {
         double alpha;
@@ -83,7 +82,7 @@ public class HeatMapPlugin implements VisualPlugin{
             chart.getStyler().setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Scatter);
             chart.getStyler().setLegendVisible(false);
             chart = this.addData(chart,alpha);
-            this.add(new XChartPanel<XYChart>(chart), BorderLayout.CENTER);
+            this.add(new XChartPanel<>(chart), BorderLayout.CENTER);
         }
         /**
          * add the data into the chart object

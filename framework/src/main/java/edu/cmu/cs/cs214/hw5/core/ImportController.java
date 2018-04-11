@@ -83,7 +83,7 @@ class ImportController {
         List<String> options = new ArrayList<>(Collections.singletonList(NAME));
         options.addAll(dp.getPopupParameters());
 
-        final JDialog dialog = new JDialog(frame, "Select a DataSet Plugin", true);
+        final JDialog dialog = new JDialog(frame, selectedDataPlugin, true);
         JPanel optionPanel = new JPanel(new GridLayout(0,1));
 
         Map<String,String> argMap = new HashMap<>();

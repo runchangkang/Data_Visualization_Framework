@@ -92,7 +92,7 @@ class ProcessorController {
                 graph.addDataSet(joined);
 
                 for (DataSet set : joinList) {
-                    graph.addRelation(new Relation(set,joiner,joined));
+                    graph.addRelation(new Relation(set,joined));
                 }
 
                 dialog.setVisible(false);
@@ -128,14 +128,13 @@ class ProcessorController {
 
         JButton closeButton = new JButton("APPLY");
 
-        //todo: move the graph application logic entirely into datagraph class
         closeButton.addActionListener(e -> {
             try {
                 Filter f = new Filter(argMap);
                 List<DataSet> dsList = new ArrayList<>(Collections.singletonList(dataSet));
                 DataSet filtered = f.apply(dsList);
                 graph.addDataSet(filtered);
-                graph.addRelation(new Relation(dataSet,f,filtered));
+                graph.addRelation(new Relation(dataSet,filtered));
                 dialog.setVisible(false);
                 cp.addStartScreen();
             }
@@ -169,7 +168,7 @@ class ProcessorController {
                 List<DataSet> dsList = new ArrayList<>(Collections.singletonList(dataSet));
                 DataSet transformed = transform.apply(dsList);
                 graph.addDataSet(transformed);
-                graph.addRelation(new Relation(dataSet,transform,transformed));
+                graph.addRelation(new Relation(dataSet,transformed));
                 dialog.setVisible(false);
                 cp.addStartScreen();
             }
