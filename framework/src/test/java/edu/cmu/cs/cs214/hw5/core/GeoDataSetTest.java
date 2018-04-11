@@ -78,6 +78,28 @@ public class GeoDataSetTest {
         assertEquals(dpList, geoNew.getDataPoints());
     }
 
+    @Test
+    public void getMinMax(){
+        Map<String, Double> geomap = new HashMap<>();
+        geomap.put("Weather", 4.001);
+        geomap.put("AQI", 5.001);
+        geo.makePoint(1.001, 2.001, 3.001, geomap,"");
+        assertEquals(4.001, geo.getMin("Weather"), 0.0001);
+        assertEquals(4.001, geo.getMax("Weather"), 0.0001);
+        assertEquals(5.001, geo.getMin("AQI"), 0.0001);
+    }
+
+    @Test
+    public void size(){
+        Map<String, Double> geomap = new HashMap<>();
+        geomap.put("Weather", 4.001);
+        geomap.put("AQI", 5.001);
+        geo.makePoint(1.001, 2.001, 3.001, geomap,"");
+        assertEquals(1, geo.size());
+        geo.makePoint(0.001,0.001,0.001,geomap,"");
+        assertEquals(2, geo.size());
+    }
+
 
 
 
