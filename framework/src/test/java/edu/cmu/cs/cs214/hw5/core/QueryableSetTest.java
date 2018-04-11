@@ -1,4 +1,5 @@
-import edu.cmu.cs.cs214.hw5.core.*;
+package edu.cmu.cs.cs214.hw5.core;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,8 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class QueryableSetTest {
 
 
-    private AttributeGroup weather;
-    private AttributeGroup magnitude;
+
     private DataPoint point1;
     private DataPoint point2;
     private DataPoint point3;
