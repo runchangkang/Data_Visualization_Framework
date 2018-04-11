@@ -27,7 +27,7 @@ public class Main {
         DataPlugin CSV = PluginLoader.getDataPlugin("CSVReader");
         DataGraph dg = new DataGraph();
         Map<String,String> argMap = new HashMap<>();
-        argMap.put(FILE_PATH_LABEL,"resources/test2.csv");
+        argMap.put(FILE_PATH_LABEL,"resources/test.csv");
         argMap.put(X_LABEL,"X");
         argMap.put(Y_LABEL,"Y");
         argMap.put(T_LABEL,"Time");
