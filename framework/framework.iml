@@ -16,8 +16,11 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: :MathParser.org-mXparser-jdk18-4.1.1:" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: :kd:" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: :MathParser.org-mXparser-jdk18-4.1.1:" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: :kd:" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: :MathParser.org-mXparser-jdk18-4.1.1:" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: :kd:" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>

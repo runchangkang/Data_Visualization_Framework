@@ -3,9 +3,7 @@ package edu.cmu.cs.cs214.hw5.core;
 import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeySizeException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Library class for visualisation plugins that implements custom data structures to enhance querying for data
@@ -14,10 +12,21 @@ import java.util.Set;
  */
 public class QueryableSet {
     private final static int NEAREST_POINTS_AMOUNT = 5;
+    private final static int P_VALUE = 5;
     private DataSet dataSet;
+    private Map<String,KDTree<DataPoint>> kdTrees = new HashMap<>();
 
+    /**
+     * Constructs a QueryableSet and initialises the kd structure.
+     * @param set
+     */
     QueryableSet(DataSet set){
         this.dataSet = set;
+        for (String attribute : set.getAttributes()){
+            AttributeGroup attributeGroup = dataSet.getAttributeGroup(attribute);
+            KDTree<DataPoint> kdTree = attributeGroup.getKdTree();
+            kdTrees.put(attribute,kdTree);
+        }
     }
 
     /**
@@ -32,19 +41,49 @@ public class QueryableSet {
      * @param attribute to get the value of
      * @return interpolated attribute value for this point.
      */
-    public double querySet (int x, int y, int t, String attribute){
-        AttributeGroup attributeGroup = dataSet.getAttributeGroup(attribute);
-        KDTree kdTree = attributeGroup.getKdTree();
+    public double querySet (double x, double y, double t, String attribute){
+        KDTree<DataPoint> queryTree = kdTrees.get(attribute);
         List<DataPoint> dataPoints = new ArrayList<>();
-        try{dataPoints = kdTree.nearest(new double[]{(double)x,(double)y,(double)t},NEAREST_POINTS_AMOUNT);}
-        catch (KeySizeException e1){}
-
-        double sum = 0;
-        for(DataPoint dataPoint : dataPoints){
-            sum += dataPoint.getAttribute(attribute);
+        try{
+            double[] queryPt = {x,y,t};
+            dataPoints = queryTree.nearest(queryPt,NEAREST_POINTS_AMOUNT);
+        }
+        catch (KeySizeException e1){
+            e1.printStackTrace();
         }
 
-        return sum/(double)NEAREST_POINTS_AMOUNT;
+        double[] distances = new double[dataPoints.size()];
+
+        int i = 0;
+        for(DataPoint point : dataPoints){
+            double dist = getDistance(point,x,y,t);
+            if (Math.abs(dist) < 0.000001){ //we've basically nailed it
+                return point.getAttribute(attribute);
+            }
+            distances[i] = dist;
+            i++;
+        }
+
+        double total1 = 0;
+        double total2 = 0;
+        int j = 0;
+        //Inverse distance weighting (Shepard) : https://en.wikipedia.org/wiki/Inverse_distance_weighting
+        for (DataPoint point : dataPoints){
+            double attr = point.getAttribute(attribute);
+            double metric = Math.pow(distances[j],P_VALUE);
+            total1 += attr / metric;
+            total2 += 1 / metric;
+            j++;
+        }
+        return (total1/total2);
+    }
+
+
+    private double getDistance(DataPoint p, double x, double y, double t){
+        double xDist = x - p.getX();
+        double yDist = y - p.getY();
+        double tDist = x - p.getT();
+        return  (xDist * xDist) + (yDist*yDist) + (tDist*tDist);
     }
 
     /**

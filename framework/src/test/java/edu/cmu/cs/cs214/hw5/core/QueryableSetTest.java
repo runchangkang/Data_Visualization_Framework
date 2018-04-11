@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 public class QueryableSetTest {
 
 
-
     private DataPoint point1;
     private DataPoint point2;
     private DataPoint point3;
@@ -68,6 +67,6 @@ public class QueryableSetTest {
 
     @Test
     public void testKDTree(){
-        assertEquals((double)7,this.queryableSet.querySet(3,2,3,"Weather"),1e-9);
+        assertEquals(6.00,this.queryableSet.querySet(3,2,3,"Weather"),1e-2);
     }
 }
