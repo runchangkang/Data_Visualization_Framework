@@ -1,3 +1,7 @@
+Check out the **Wiki** in this repository for full discussion and documentation of our framework.
+
+---
+
 This repository is for the Homework 5 team assignment.  The basic structure
 of this repository is:
  * `hw5a`: Use this directory for your Homework 5a work.
