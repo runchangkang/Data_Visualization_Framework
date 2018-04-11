@@ -95,7 +95,6 @@ class ImportController {
             if(verifyMap(argMap,options)){
                 try {
                     Collection<ClientPoint> dSet = dp.getCollection(argMap);
-                    //System.out.println(argMap.get("N"));
                     graph.addClientSet(dSet,argMap.get(NAME));
                     dialog.setVisible(false);
                     cp.addStartScreen();

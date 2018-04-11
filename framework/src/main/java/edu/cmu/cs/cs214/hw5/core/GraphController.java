@@ -82,7 +82,7 @@ class GraphController {
                 y = Math.max(y,dataMap.get(set).getY());
             }
         }
-        return y + 2;
+        return y + 1;
     }
 
     /**
@@ -143,7 +143,7 @@ class GraphController {
                         shiftMapRight(parentLocation.getX()+1);
                     }
                     dataMap.put(set,target);
-
+                //todo: join landing under last shift down if needed
                 } else if (graph.numParents(set) > 1) { //join operation performed    (add down)
                     List<DataSet> parents = graph.getAllParents(set);
                     int maxX = 0;
@@ -255,7 +255,7 @@ class GraphController {
         GraphPanel graphContainer = new GraphPanel(new GridBagLayout(),graph);
 
         for (int i = 0; i <= yDim; i++){
-            for (int j = 0; j <= xDim; j++){
+            for (int j = 0; j <= xDim; j++){ //todo: if !rowContainsElement() for top & bottom rows (L/R col still ++)
                 if (!dataMap.values().contains(new Location(j,i)) && (i == 0 || j == 0 || i == yDim || j == xDim)){
                     JPanel panel = new JPanel();
                     panel.setMinimumSize(new Dimension(width/xDim,height/yDim));

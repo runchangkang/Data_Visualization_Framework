@@ -157,158 +157,6 @@ class ControlPanel extends JPanel{
     }
 
     /**
-     * MAIN METHOD FOR VISUALISATION PLUGIN IMPLEMENTATION -- CREATES A POPUP.
-     * This enables as many separate views as your computer can handle!
-     * //todo: vizcontroller?
-     */
-     void vizWindow(){
-        JPanel panel = new JPanel(new BorderLayout());
-
-        //Default case: a visualisation has not yet been initialised
-        if (selectedVizSet == null || selectedVizPlugin == null) {
-            //System.out.println("Something is null");
-            JButton params = new JButton("Parameters");
-            params.setPreferredSize(new Dimension(VIZ_WIDTH, 100));
-            panel.add(params, BorderLayout.NORTH);
-            panel.add(new JButton("Visual Window"), BorderLayout.CENTER);
-            panel.setPreferredSize(new Dimension(VIZ_WIDTH, WINDOW_HEIGHT));
-        }
-        else{  //okok Let's draw it!
-            JDialog visualDisplay = new JDialog(frame, "Displaying " +
-                    this.selectedVizSet.getName() + " with " + this.selectedVizPlugin, false);
-
-            VisualPlugin plugin = PluginLoader.getVizPlugin(this.selectedVizPlugin);
-            if (plugin == null){ //something really really bad happened
-                return;
-            }
-
-            Map<String,Double> argMap = new HashMap<>();
-
-
-            JPanel container = new JPanel();
-
-            /* Logic: The visualisation is contained within the container panel.
-             *     -> A reference is kept to the container panel by the slider listener
-             *     -> argMap is initialised to standard but can be changed (just like the text popups)
-             *     -> The container is reset and fully redrawn with new argMap on slider change
-             */
-
-            JPanel paramWrapper = new JPanel(new GridLayout(0,1));
-
-            for (Parameter p : plugin.addInterfaceParameters().getParameters()){
-                JPanel params = new JPanel(new BorderLayout());
-                System.out.println(p.getName());
-                argMap.put(p.getName(), (p.getMin() + p.getMax()) / 2);
-                JLabel label = new JLabel(p.getName() + "    " + new DecimalFormat("####.##").format(p.getMin()));
-                JSlider slider = new JSlider((int) p.getMin(), (int) p.getMax());
-                JLabel max = new JLabel(new DecimalFormat("####.##").format(p.getMax()));
-                slider.addChangeListener( e ->{
-                    container.removeAll();
-                    argMap.put(p.getName(),(double) slider.getValue());
-                    container.add(drawViz(plugin,argMap));
-                    container.revalidate();
-                    container.repaint();
-                });
-                params.add(label,BorderLayout.WEST);
-                params.add(slider,BorderLayout.CENTER);
-                params.add(max,BorderLayout.EAST);
-                paramWrapper.add(params);
-            }
-            panel.add(paramWrapper,BorderLayout.NORTH);
-
-
-            JPanel drawnViz = drawViz(plugin,argMap);
-            container.add(drawnViz);
-            panel.add(container,BorderLayout.CENTER);
-            panel.setBorder(new EmptyBorder(20,50,20,50));
-            panel.setPreferredSize(new Dimension(VIZ_WIDTH + 100,WINDOW_HEIGHT));
-
-            display(visualDisplay,panel,frame);
-        }
-    }
-
-    /**
-     * Redraw the visualisation the plugin's method / reparameterized argmap
-     * @param plugin to visualise with
-     * @param argMap parameters to use
-     * @return drawn JPanel
-     */
-    private JPanel drawViz(VisualPlugin plugin,Map<String,Double> argMap){
-        return plugin.drawSet(new QueryableSet(selectedVizSet),
-                VIZ_WIDTH,WINDOW_HEIGHT-100,argMap);
-    }
-
-    /**
-     * Defines button to apply processing to a dataset
-     * @param dataSet to apply transform to
-     */
-    void transDialog(DataSet dataSet){
-        final JDialog dialog = new JDialog(frame, "Select Processing Operation", true);
-
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-
-        JButton fButton = new JButton("Filter");
-        fButton.addActionListener(e -> {dialog.setVisible(false);pc.filterDialog(dataSet,graph);});
-        optionPanel.add(fButton);
-
-        JButton tButton = new JButton("Transform");
-        tButton.addActionListener(e -> {dialog.setVisible(false);pc.transformDialog(dataSet,graph);});
-        optionPanel.add(tButton);
-
-        JButton jButton = new JButton("Join");
-        jButton.addActionListener(e -> {dialog.setVisible(false);pc.joinDialog(dataSet,graph);});
-        optionPanel.add(jButton);
-
-        optionPanel.setPreferredSize(new Dimension(PANEL_WIDTH,PANEL_HEIGHT));
-
-        display(dialog,optionPanel,frame);
-    }
-
-    /**
-     * Sets the current vizSet state to be called by other function to make popup
-     * @param ds the current DataSet to visualise.
-     */
-    public void setSelectedVizSet(DataSet ds){
-        this.selectedVizSet = ds;
-    }
-
-    /**
-     * Popup dialog to set controlPanel's visualization plugin from the available options
-     */
-    public void getSelectedVizPlugin(){
-        final JDialog dialog = new JDialog(frame, "Select a Visualisation Plugin", true);
-        selectedVizPlugin = null; //reset
-
-        JPanel optionPanel = new JPanel(new GridLayout(0,1));
-        optionPanel.add(new JLabel("  Select a Visual Plugin from the loaded list.  "));
-
-        for (String pluginName : vizPluginList){
-            JButton button = new JButton(pluginName);
-            button.addActionListener(e -> {
-                this.selectedVizPlugin = pluginName;
-                //System.out.println(this.selectedVizPlugin);
-            });
-            optionPanel.add(button);
-        }
-
-        JButton closeButton = new JButton("VISUALIZE");
-        closeButton.addActionListener(e -> {
-            if(selectedVizPlugin != null) {
-                dialog.setVisible(false);
-                addStartScreen();
-            }
-            else{
-                JOptionPane.showMessageDialog(dialog, "Please select a visual plugin.");
-            }
-        });
-        optionPanel.add(closeButton);
-        optionPanel.setPreferredSize(new Dimension(PANEL_WIDTH,PANEL_HEIGHT));
-
-        display(dialog,optionPanel,frame);
-    }
-
-
-    /**
      * Global dialog popup function
      * @param d dialog to popup
      * @param content to place in the dialog
@@ -362,5 +210,155 @@ class ControlPanel extends JPanel{
         wrapper.add(labelPanel,BorderLayout.WEST);
         wrapper.add(fieldPanel,BorderLayout.CENTER);
         return wrapper;
+    }
+
+    /**
+     * Defines button to apply processing to a dataset
+     * @param dataSet to apply transform to
+     */
+    void transDialog(DataSet dataSet){
+        final JDialog dialog = new JDialog(frame, "Select Processing Operation", true);
+
+        JPanel optionPanel = new JPanel(new GridLayout(0,1));
+
+        JButton fButton = new JButton("Filter");
+        fButton.addActionListener(e -> {dialog.setVisible(false);pc.filterDialog(dataSet,graph);});
+        optionPanel.add(fButton);
+
+        JButton tButton = new JButton("Transform");
+        tButton.addActionListener(e -> {dialog.setVisible(false);pc.transformDialog(dataSet,graph);});
+        optionPanel.add(tButton);
+
+        JButton jButton = new JButton("Join");
+        jButton.addActionListener(e -> {dialog.setVisible(false);pc.joinDialog(dataSet,graph);});
+        optionPanel.add(jButton);
+
+        optionPanel.setPreferredSize(new Dimension(PANEL_WIDTH,PANEL_HEIGHT));
+
+        display(dialog,optionPanel,frame);
+    }
+
+    /**
+     * MAIN METHOD FOR VISUALISATION PLUGIN CONTROL -- CREATES A POPUP.
+     * This enables as many separate views as your computer can handle!
+     */
+    void vizWindow(){
+        JPanel panel = new JPanel(new BorderLayout());
+
+        //Default case: a visualisation has not yet been initialised
+        if (selectedVizSet == null || selectedVizPlugin == null) {
+            //System.out.println("Something is null");
+            JButton params = new JButton("Parameters");
+            params.setPreferredSize(new Dimension(VIZ_WIDTH, 100));
+            panel.add(params, BorderLayout.NORTH);
+            panel.add(new JButton("Visual Window"), BorderLayout.CENTER);
+            panel.setPreferredSize(new Dimension(VIZ_WIDTH, WINDOW_HEIGHT));
+        }
+        else{  //okok Let's draw it!
+            JDialog visualDisplay = new JDialog(frame, "Displaying " +
+                    this.selectedVizSet.getName() + " with " + this.selectedVizPlugin, false);
+
+            VisualPlugin plugin = PluginLoader.getVizPlugin(this.selectedVizPlugin);
+            if (plugin == null){ //something really really bad happened
+                return;
+            }
+
+            Map<String,Double> argMap = new HashMap<>();
+
+
+            JPanel container = new JPanel();
+
+            /* Logic: The visualisation is contained within the container panel.
+             *     -> A reference is kept to the container panel by the slider listener
+             *     -> argMap is initialised to standard but can be changed (just like the text popups)
+             *     -> The container is reset and fully redrawn with new argMap on slider change
+             */
+
+            JPanel paramWrapper = new JPanel(new GridLayout(0,1));
+
+            for (Parameter p : plugin.addInterfaceParameters().getParameters()){
+                JPanel params = new JPanel(new BorderLayout());
+                argMap.put(p.getName(), (p.getMin() + p.getMax()) / 2);
+                JLabel label = new JLabel(p.getName() + "    " + new DecimalFormat("####.##").format(p.getMin()));
+                JSlider slider = new JSlider((int) p.getMin(), (int) p.getMax());
+                JLabel max = new JLabel(new DecimalFormat("####.##").format(p.getMax()));
+                slider.addChangeListener( e ->{
+                    container.removeAll();
+                    argMap.put(p.getName(),(double) slider.getValue());
+                    container.add(drawViz(plugin,argMap));
+                    container.revalidate();
+                    container.repaint();
+                });
+                params.add(label,BorderLayout.WEST);
+                params.add(slider,BorderLayout.CENTER);
+                params.add(max,BorderLayout.EAST);
+                paramWrapper.add(params);
+            }
+            panel.add(paramWrapper,BorderLayout.NORTH);
+
+
+            JPanel drawnViz = drawViz(plugin,argMap);
+            container.add(drawnViz);
+            panel.add(container,BorderLayout.CENTER);
+            panel.setBorder(new EmptyBorder(20,50,20,50));
+            panel.setPreferredSize(new Dimension(VIZ_WIDTH + 100,WINDOW_HEIGHT));
+
+            display(visualDisplay,panel,frame);
+        }
+    }
+
+    /**
+     * Redraw the visualisation the plugin's method / reparameterized argmap
+     * @param plugin to visualise with
+     * @param argMap parameters to use
+     * @return drawn JPanel
+     */
+    private JPanel drawViz(VisualPlugin plugin,Map<String,Double> argMap){
+        return plugin.drawSet(new QueryableSet(selectedVizSet),
+                VIZ_WIDTH,WINDOW_HEIGHT-100,argMap);
+    }
+
+
+    /**
+     * Sets the current vizSet state to be called by other function to make popup
+     * @param ds the current DataSet to visualise.
+     */
+    public void setSelectedVizSet(DataSet ds){
+        this.selectedVizSet = ds;
+    }
+
+    /**
+     * Popup dialog to set controlPanel's visualization plugin from the available options
+     */
+    public void getSelectedVizPlugin(){
+        final JDialog dialog = new JDialog(frame, "Select a Visualisation Plugin", true);
+        selectedVizPlugin = null; //reset
+
+        JPanel optionPanel = new JPanel(new GridLayout(0,1));
+        optionPanel.add(new JLabel("  Select a Visual Plugin from the loaded list.  "));
+
+        for (String pluginName : vizPluginList){
+            JButton button = new JButton(pluginName);
+            button.addActionListener(e -> {
+                this.selectedVizPlugin = pluginName;
+                //System.out.println(this.selectedVizPlugin);
+            });
+            optionPanel.add(button);
+        }
+
+        JButton closeButton = new JButton("VISUALIZE");
+        closeButton.addActionListener(e -> {
+            if(selectedVizPlugin != null) {
+                dialog.setVisible(false);
+                addStartScreen();
+            }
+            else{
+                JOptionPane.showMessageDialog(dialog, "Please select a visual plugin.");
+            }
+        });
+        optionPanel.add(closeButton);
+        optionPanel.setPreferredSize(new Dimension(PANEL_WIDTH,PANEL_HEIGHT));
+
+        display(dialog,optionPanel,frame);
     }
 }

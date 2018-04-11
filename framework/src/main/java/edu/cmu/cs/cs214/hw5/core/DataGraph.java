@@ -12,27 +12,37 @@ class DataGraph {
     private List<DataSet> dataSets = new ArrayList<>();
     private List<Relation> relations = new ArrayList<>();
 
-    private int counter = 0;
-
     /**
-     * Adds a new relationship into the graph
+     * Adds a new relationship between two dataSets into the graph
      * @param relation to add
      */
-    public void addRelation(Relation relation){
+    void addRelation(Relation relation){
         relations.add(relation);
     }
 
-    public List<Relation> getRelations(){
+    /**
+     * @return all of the relations in the DataGraph
+     */
+    List<Relation> getRelations(){
         return new ArrayList<>(relations);
     }
 
-    public List<DataSet> getDataSets() {
+    /**
+     * @return all of the datasets current in the datagraph.
+     */
+    List<DataSet> getDataSets() {
         return new ArrayList<>(dataSets);
     }
 
-    public void addClientSet(Collection<ClientPoint> initialSet, String name){
+    /**
+     * Constructs a DataSet object from an incoming collection of Client Points as provided by the plugin.
+     * Subsequently adds the set to the graph, but it is not yet part of any relations.
+     *
+     * @param initialSet collection of client points to initialise into a set
+     * @param name of the set, if any.
+     */
+    void addClientSet(Collection<ClientPoint> initialSet, String name){
         DataSet gs = new GeoDataSet(new ArrayList<>(),name);
-        counter++;
 
         for (ClientPoint cp : initialSet){
             gs.makePoint(cp.getX(),cp.getY(),cp.getT(),cp.getAttr(),cp.getLabel());
@@ -40,12 +50,21 @@ class DataGraph {
         dataSets.add(gs);
     }
 
-    public void addDataSet(DataSet set){
+    /**
+     * Adds a DataSet to the graph manually.
+     * @param set to add
+     */
+    void addDataSet(DataSet set){
         this.dataSets.add(set);
-        counter++;
     }
 
-    public int numParents(DataSet set){
+    /**
+     * Number of all of the relations that have this dataset as a 'child' (result of the relation's processing) on
+     * some other data set.
+     * @param set to find parents of
+     * @return number of parents
+     */
+    int numParents(DataSet set){
         int i = 0;
         for (Relation r : relations){
             if (set.equals(r.getResult())){
@@ -55,7 +74,13 @@ class DataGraph {
         return i;
     }
 
-    public DataSet getParent(DataSet set){
+    /**
+     * Returns an arbitrary parent of a DataSet (a set that has a relation to this set through a processing operation
+     * performed on it). This is best used when there is only one parent.
+     * @param set to get parent of
+     * @return parent
+     */
+    DataSet getParent(DataSet set){
         for (Relation r : relations){
             if (set.equals(r.getResult())){
                 return r.getSource();
@@ -64,7 +89,12 @@ class DataGraph {
         throw new IllegalArgumentException("Set doesn't have a parent in this graph!");
     }
 
-    public List<DataSet> getAllParents(DataSet set){
+    /**
+     * Return all parents of the DataSet in question (best used when there are multiple parents).
+     * @param set to get the parents of
+     * @return collection of parents
+     */
+    List<DataSet> getAllParents(DataSet set){
         List<DataSet> parents = new ArrayList<>();
 
         for (Relation r : relations){
@@ -72,7 +102,6 @@ class DataGraph {
                 parents.add(r.getSource());
             }
         }
-
         return parents;
     }
 }
