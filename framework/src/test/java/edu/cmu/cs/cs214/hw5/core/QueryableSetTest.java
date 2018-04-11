@@ -15,8 +15,6 @@ import static org.junit.Assert.assertEquals;
 public class QueryableSetTest {
 
 
-    private AttributeGroup weather;
-    private AttributeGroup magnitude;
     private DataPoint point1;
     private DataPoint point2;
     private DataPoint point3;

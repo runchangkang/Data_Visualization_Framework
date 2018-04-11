@@ -8,6 +8,7 @@ import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.XYSeries;
+import org.knowm.xchart.style.markers.SeriesMarkers;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +23,7 @@ import java.util.List;
 public class HeatMapPlugin implements VisualPlugin{
 
     private static final String ALPHA = "Alpha";
-
+    private static final int LABEL_DISPLAY_THESHOLD = 200;
     /**
      * get the name of the vis plugin
      * @return
@@ -95,12 +96,15 @@ public class HeatMapPlugin implements VisualPlugin{
             Color WHITE = Color.white;
             Random random = new Random();
             for (String attr : queryableSet.getAttributes()) {
-
+                List<DataPoint> dataPoints = queryableSet.getAttributeGroup(attr);
                 colorMap.put(attr,colors[random.nextInt(colors.length-1)]);
-                double[] minMax = this.getMinMax(queryableSet.getAttributeGroup(attr),attr);
-                for (DataPoint dataPoint : queryableSet.getAttributeGroup(attr)) {
+                double[] minMax = this.getMinMax(dataPoints,attr);
+                for (DataPoint dataPoint : dataPoints) {
                     String name = attr+dataPoint.getX()+dataPoint.getY()+dataPoint.getT()+random.nextInt(100000);
                     XYSeries series = xyChart.addSeries(name,new double[]{dataPoint.getX()},new double[]{dataPoint.getY()});
+                    if(dataPoints.size()<=LABEL_DISPLAY_THESHOLD){ series.setLabel(dataPoint.getLabel());}
+                    series.setMarker(SeriesMarkers.CIRCLE);
+
                     Color thisColor = this.getColor(minMax,dataPoint.getAttribute(attr),colorMap.get(attr),WHITE,alpha);
                     series.setMarkerColor(thisColor);
 
