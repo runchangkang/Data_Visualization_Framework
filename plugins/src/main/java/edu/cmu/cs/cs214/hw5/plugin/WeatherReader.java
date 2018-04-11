@@ -12,9 +12,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 
 public class WeatherReader implements DataPlugin {
-    private final String TOKEN = "70a98b0d680c7284430c43e811999bdd";
+    private final String TOKEN_PARAM = "API Token";
     private final String COUNTRY_LABEL = "Country Code (ISO 3166)";
     private final String CITY_NAME = "City";
     private final String NAME = "Weather Reader";
@@ -27,12 +28,13 @@ public class WeatherReader implements DataPlugin {
         return NAME;
     }
 
+
     /**
      * @return list of field labels that the framework will prompt the client to provide
      */
     @Override
     public List<String> getPopupParameters() {
-        return new ArrayList<>(Arrays.asList(COUNTRY_LABEL, CITY_NAME));
+        return new ArrayList<>(Arrays.asList(TOKEN_PARAM,COUNTRY_LABEL, CITY_NAME));
     }
 
     /**
@@ -45,7 +47,7 @@ public class WeatherReader implements DataPlugin {
         ArrayList<ClientPoint> pointList = new ArrayList<>();
 
         String website = "http://api.openweathermap.org/data/2.5/forecast?q=";
-        String token = "&APPID=" + TOKEN;
+        String token = "&APPID=" + argumentMap.get(TOKEN_PARAM);
         String city = argumentMap.get(CITY_NAME);
         String country = argumentMap.get(COUNTRY_LABEL);
         String requestURL = website + city + "," + country + token;

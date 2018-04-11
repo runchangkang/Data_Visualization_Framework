@@ -49,12 +49,14 @@ public class PixelMap implements VisualPlugin {
 
     private class MapPanel extends JPanel{
 
+        //Basic info
         private QueryableSet qSet;
         private double width;
         private double height;
         private double spacing;
         private int intspacing;
 
+        //Caches a bunch of double values to speed up the inner draw loop
         private double minx;
         private double maxx;
         private double xRange;
@@ -64,6 +66,7 @@ public class PixelMap implements VisualPlugin {
         private float color;
         private double time;
 
+        //Parameter Selection
         private String nextParam;
         private double paramMax;
         private double paramMin;
@@ -108,7 +111,7 @@ public class PixelMap implements VisualPlugin {
             for (double i = 0; i < height; i += spacing){
                 double percenti = i / height;
                 double queryY = this.miny + (yRange * percenti);
-                for (double j = 0; j < width; j += spacing){ //unroll this to a separate loop?
+                for (double j = 0; j < width; j += spacing){
                     double percentj = j / width;
                     double queryX = this.minx + (xRange * percentj);
                     double result = this.qSet.querySet(queryX, queryY, this.time, nextParam);
