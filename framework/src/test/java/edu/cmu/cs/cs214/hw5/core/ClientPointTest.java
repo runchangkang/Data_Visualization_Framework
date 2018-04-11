@@ -1,4 +1,5 @@
-import edu.cmu.cs.cs214.hw5.core.ClientPoint;
+package edu.cmu.cs.cs214.hw5.core;
+
 import org.junit.Before;
 import org.junit.Test;
 
