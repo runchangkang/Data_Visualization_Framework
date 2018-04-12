@@ -134,7 +134,7 @@ public class PixelMap implements VisualPlugin {
 
             //Parameter selection - get the param we're looking for
             if (qSet.getAttributes().size() > 0){
-                int index = Math.max((int) (qSet.getAttributes().size() * param), qSet.getAttributes().size() -1);
+                int index = Math.min((int) (qSet.getAttributes().size() * param), qSet.getAttributes().size() -1);
                 nextParam = qSet.getAttributes().toArray(new String[qSet.getAttributes().size()])[index];
                 paramMin = getMin(qSet,nextParam);
                 paramMax = getMax(qSet,nextParam);

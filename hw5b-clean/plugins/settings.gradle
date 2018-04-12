@@ -1,0 +1,2 @@
+include ':framework'
+project(':framework').projectDir = file('../framework')

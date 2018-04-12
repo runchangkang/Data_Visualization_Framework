@@ -1,0 +1,19 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'application'
+mainClassName = 'edu.cmu.cs.cs214.hw5.core.Main'
+
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+    mavenCentral()
+}
+
+dependencies {
+	compile 'com.google.code.gson:gson:2.8.2'
+    compile name: 'super-csv-2.4.0'
+    compile name: 'xchart-3.5.1'
+    compile project(':framework')
+    testCompile 'junit:junit:4.12'
+}
