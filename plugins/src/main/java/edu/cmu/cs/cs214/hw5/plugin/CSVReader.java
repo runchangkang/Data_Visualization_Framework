@@ -15,7 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Parses a CSV file using user-defined parameters. Each row represents a DataPoint.
+ * This API takes in any kind of CSV file, and relies on the user to input the column name for the
+ * X values, Y values, Time values, and other Attribute values the user wishes to read
+ * -- the assumption is being made that users know what the file contains. Each row represents a DataPoint, and
+ * each column header a possible attribute value.
+ *
+ * See the project Wiki for further details
  */
 public class CSVReader implements DataPlugin {
 
@@ -41,6 +46,8 @@ public class CSVReader implements DataPlugin {
      *          <"T","Time">
      *          <"Attributes","Wind,Light,Temperature">>
      *
+     *  See the plugin documentation on the project wiki for further details.
+     *
      * @param argumentMap map of arguments from user
      * @return collection of data ready to be made into a DataSet
      */
@@ -55,7 +62,12 @@ public class CSVReader implements DataPlugin {
     }
 
     /**
-     * @return Labels of fields that this plugin asks the user to provide
+     * The client is expected to provide a list of desired input strings, in order to parameterize data
+     * and provide plugin-specific or use-specific information (e.g. file path). Each parameter string will be
+     * associated with a text field in a popup. A result is expected for each of these, which the plugin
+     * can then choose to use or disregard.
+     *
+     * @return list of field labels.
      */
     @Override
     public List<String> getPopupParameters(){
@@ -64,14 +76,16 @@ public class CSVReader implements DataPlugin {
 
 
     /**
-     * Fetches data directly from CSV
+     * Helper method -- Fetches data directly from CSV
      * @param path file path
      * @param xcol name of column containing x data
      * @param ycol name of column containing y data
      * @param tcol name of column containing time data
      * @param attrCols name of columns containing other data
      */
-    public List<ClientPoint> inputData(String path, String xcol, String ycol, String tcol, List<String> attrCols) throws Exception {
+    public List<ClientPoint> inputData(String path, String xcol, String ycol,
+                                       String tcol, List<String> attrCols) throws Exception {
+        //Setup reading
         FileReader file = new FileReader(path);
         CsvMapReader reader = null;
 
@@ -82,6 +96,7 @@ public class CSVReader implements DataPlugin {
             final String[] header = reader.getHeader(true);
             final CellProcessor[] processors = new CellProcessor[header.length];
 
+            //parse the CSV
             Map<String, Object> values;
             while ((values = reader.read(header, processors)) != null) {
                 double x = Double.parseDouble((String) values.get(xcol));
@@ -94,15 +109,18 @@ public class CSVReader implements DataPlugin {
                         attributeMap.put(attribute, Double.parseDouble((String) values.get(attribute)));
                     }
                 }
+                //Add a new clientPoint (no labels in this implementation)
                 ClientPoint p = new ClientPoint(x,y,z,attributeMap,"");
                 pointList.add(p);
             }
         }
         finally{
             if(reader != null) {
+                //cleanup
                 reader.close();
             }
         }
+
         return pointList;
     }
 

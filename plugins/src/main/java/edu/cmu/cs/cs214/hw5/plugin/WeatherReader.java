@@ -11,26 +11,33 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * The WeatherReader uses the OpenWeatherMap API (http://api.openweathermap.org) to fetch
+ * 5-Day forecast data. The user is expected to provide their own API key (see plugin documentation in the Wiki).
+ */
 public class WeatherReader implements DataPlugin {
-    private final String TOKEN_PARAM = "API Token";
-    private final String COUNTRY_LABEL = "Country Code (ISO 3166)";
-    private final String CITY_NAME = "City";
-    private final String NAME = "Weather Reader";
+    private final static String TOKEN_PARAM = "API Token";
+    private final static String COUNTRY_LABEL = "Country Code (ISO 3166)";
+    private final static String CITY_NAME = "City";
+    private final static String NAME = "Weather Reader";
 
     /**
-     * @return name of this data plugin in the selection screen
+     * @return Name of this data plugin in the selection screen
      */
     @Override
     public String getName() {
         return NAME;
     }
 
-
     /**
-     * @return list of field labels that the framework will prompt the client to provide
+     * @return List of field labels that the framework will prompt the client to provide
      */
     @Override
     public List<String> getPopupParameters() {
@@ -38,14 +45,20 @@ public class WeatherReader implements DataPlugin {
     }
 
     /**
+     * The client implements this method to fetch the data from the data source. The client is provided the results
+     * of the getPopupParameters they implemented earlier in the form of a mapping from key (parameter field label)
+     * to value (input result from client). The client is then responsible for validating these parameters.
+     *
      * @param argumentMap map from field parameters to client-provided arguments
-     * @return collection of Points ready to be parsed into a DataSet
-     * @throws Exception if there was an I/O or parsing error (FileNotFound, I/O Exception, ParseException)
+     * @return collection of Points ready to be input into the framework
+     * @throws Exception if there was an I/O or parsing error (FileNotFound, I/O Exception, ParseException). The
+     * framework will display an appropriate error to the user.
      */
     @Override
     public Collection<ClientPoint> getCollection(Map<String, String> argumentMap) throws Exception {
         ArrayList<ClientPoint> pointList = new ArrayList<>();
 
+        //Fetching parameters from the client and setting up the API Call
         String website = "http://api.openweathermap.org/data/2.5/forecast?q=";
         String token = "&APPID=" + argumentMap.get(TOKEN_PARAM);
         String city = argumentMap.get(CITY_NAME);
@@ -54,13 +67,14 @@ public class WeatherReader implements DataPlugin {
         URL url = new URL(requestURL);
         InputStream is = url.openStream();
         try {
-              /* Now read the retrieved document from the stream. */
+            // Now read the retrieved document from the stream.
             HttpURLConnection request = (HttpURLConnection) url.openConnection();
             request.connect();
 
             // Convert to a JSON object to print data
             JsonParser jp = new JsonParser(); //from gson
-            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+            //Convert the input stream to a json element
+            JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
             JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object.
 
             JsonObject cityJson = rootobj.getAsJsonObject("city");
@@ -70,6 +84,7 @@ public class WeatherReader implements DataPlugin {
 
             JsonArray list = rootobj.getAsJsonArray("list");
 
+            //Extract relevant parameters to double format
             for(JsonElement dayElem : list){
                 JsonObject day = (JsonObject) dayElem;
                 Double time = day.get("dt").getAsDouble();
@@ -107,11 +122,13 @@ public class WeatherReader implements DataPlugin {
                 attrs.put("windDegree", windDegree);
                 attrs.put("rain3h", rain3h);
 
+                //Create ClientPoint and add it to the collection
                 ClientPoint cp = new ClientPoint(lon, lat, time, attrs, "3 Hour Incremental");
                 pointList.add(cp);
             }
 
         } finally {
+            //clean up
             is.close();
         }
 
